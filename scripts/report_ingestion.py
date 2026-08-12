@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.parse import urlsplit, urlunsplit
+from xml.etree.ElementTree import ParseError
 
 from hub_config import configured_report_sources
 from report_formats import EXTRACTOR_VERSION, FormatError, extract_document
@@ -927,6 +928,7 @@ def command_scan(args: argparse.Namespace) -> None:
                 OSError,
                 ValueError,
                 FormatError,
+                ParseError,
                 subprocess.CalledProcessError,
             ) as error:
                 result = {"state": "error", "source": str(source), "error": str(error)}

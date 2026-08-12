@@ -453,6 +453,48 @@ class ReportIngestionTest(unittest.TestCase):
             state = json.loads((store / "scan-state.json").read_text(encoding="utf-8"))
             self.assertEqual(state["latest_state"], "interrupted")
 
+    def test_malformed_docx_xml_is_isolated_as_scan_error(self) -> None:
+        import sys
+        import zipfile
+
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import report_ingestion
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "malformed.docx"
+            with zipfile.ZipFile(source, "w") as archive:
+                archive.writestr("word/document.xml", "<document><broken></document>")
+            store = root / "data" / "report-ingestion"
+            patches = {
+                "STORE": store,
+                "ARTIFACTS": store / "artifacts",
+                "LOCAL_PROFILES": store / "profiles",
+                "INDEX": store / "index.jsonl",
+                "DECISIONS": store / "decisions.jsonl",
+                "SCAN_RUNS": store / "scan-runs",
+                "SCAN_STATE": store / "scan-state.json",
+            }
+            args = Namespace(
+                paths=[str(source)],
+                configured=False,
+                force=False,
+                quiet=True,
+                limit=None,
+                include_ambiguous=False,
+            )
+            with mock.patch.multiple(report_ingestion, **patches):
+                report_ingestion.command_scan(args)
+
+            state = json.loads((store / "scan-state.json").read_text(encoding="utf-8"))
+            self.assertEqual(state["latest_state"], "complete")
+            summary = json.loads(
+                (store / "scan-runs" / state["active_run"] / "summary.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            self.assertEqual(summary["states"], {"error": 1})
+
     def test_audit_json_reports_degraded_for_interrupted_scan(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             data = Path(temporary) / "data"
