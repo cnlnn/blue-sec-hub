@@ -81,6 +81,7 @@ GENERIC_FINDING_LABEL = re.compile(
     r"^View Source Code$|^发现方式（.*）$|^攻击内容$|^未发现漏洞$|"
     r"^统一资产发现与漏洞检测工具$|^高危漏洞$|^具体描述$|"
     r"^漏洞(?:危害|归属单位|等级)$|"
+    r"^漏洞修复统计结果展示$|^漏洞管理闭环评估(?:（.*）)?$|"
     r"网络安全漏洞扫描系统.*安全评估报告",
     re.IGNORECASE,
 )
@@ -103,7 +104,12 @@ ROOT_CAUSE_RULES: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("server-side-code-execution", re.compile(r"容器逃逸|container escape|宿主机.*(?:root|代码执行)|服务端.*(?:命令|代码)执行", re.I)),
     ("message-delivery-abuse-control", re.compile(r"短信.*(?:轰炸|滥用|限频)|验证码.*(?:轰炸|发送|滥用)|邮件.*轰炸|message delivery", re.I)),
     ("oauth-public-client-binding", re.compile(r"oauth|oidc|pkce|authorization code|client.?secret|redirect.?uri", re.I)),
-    ("identity-state-response-differential", re.compile(r"账号枚举|用户枚举|注册状态.*差异|identity.*enumeration|account.*enumeration", re.I)),
+    ("identity-state-response-differential", re.compile(r"账号枚举|用户(?:名)?枚举|注册状态.*差异|identity.*enumeration|account.*enumeration", re.I)),
+    ("authentication-bypass", re.compile(r"任意用户登录|身份认证绕过|认证绕过|authentication bypass", re.I)),
+    ("cleartext-sensitive-transport", re.compile(r"敏感信息明文传输|明文传输.*(?:口令|密码|凭据|敏感)|cleartext.*(?:credential|password|sensitive)", re.I)),
+    ("object-authorization-lifecycle", re.compile(r"查看任意(?:表单|记录|对象)|任意(?:表单|记录|对象).*(?:查看|读取)", re.I)),
+    ("message-broker-authentication", re.compile(r"mqtt.*(?:未设置|缺少|无).*(?:账号|密码|认证)|(?:消息|mqtt).*(?:未授权|匿名).*(?:发布|订阅|连接)", re.I)),
+    ("ot-actuator-command-authorization", re.compile(r"远程(?:断电|停机|重启|控制).*(?:漏洞|未授权)|未授权.*(?:断电|停机|重启|控制)", re.I)),
     ("cross-protocol-authorization-parity", re.compile(r"websocket|sse|长连接|跨协议|发布者|订阅者|publisher|subscriber", re.I)),
     ("workload-identity-rbac-blast-radius", re.compile(r"service.?account|role.?binding|cluster.?role|rbac|跨命名空间|namespace.*权限|tokenrequest|nodes/proxy|(?:工作负载|节点|cni).*(?:凭据|token).*(?:集群|配置|跨租户).*权限", re.I)),
     ("credential-forwarding-confused-deputy", re.compile(r"代带凭据|转发.*凭据|bearer.*转发|代理.*凭据|scraper.*credential|confused deputy", re.I)),

@@ -233,10 +233,25 @@ class KnowledgeDistillationTest(unittest.TestCase):
         fixed = {"weakness_class": "不安全的前端加密（已修复）"}
         self.assertEqual(finding_cluster_key(base), finding_cluster_key(fixed))
         self.assertTrue(generic_finding_title("具体描述"))
+        self.assertTrue(generic_finding_title("漏洞修复统计结果展示"))
+        self.assertTrue(generic_finding_title("漏洞管理闭环评估（基于表字段可审计性）"))
         self.assertTrue(
             generic_finding_title(
                 "确保每个用户仅能访问其执行任务所需的最少资源，不得扩大权限范围"
             )
+        )
+
+        self.assertEqual(
+            finding_cluster_key({"weakness_class": "用户名枚举"}),
+            "identity-state-response-differential",
+        )
+        self.assertEqual(
+            finding_cluster_key({"weakness_class": "电表MQTT通信未设置账号密码"}),
+            "message-broker-authentication",
+        )
+        self.assertEqual(
+            finding_cluster_key({"weakness_class": "远程断电漏洞"}),
+            "ot-actuator-command-authorization",
         )
 
     def test_distillation_accounts_for_sources_and_separates_scanner(self) -> None:

@@ -227,6 +227,56 @@ class ReportIngestionTest(unittest.TestCase):
             )
             self.assertEqual(artifact["relevance"]["disposition"], "accepted")
 
+    def test_baseline_remediation_report_requires_structured_controls(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            report = root / "hardening.docx"
+            write_docx(
+                report,
+                "".join(
+                    [
+                        paragraph("评估指标"),
+                        paragraph("评估项"),
+                        paragraph("不符合项"),
+                        paragraph("加固建议"),
+                        paragraph("加固情况"),
+                        paragraph("加固前"),
+                        paragraph("加固后"),
+                    ]
+                ),
+            )
+            data = root / "data"
+            self.run_tool(data, "scan", "--quiet", str(report))
+            artifact = self.artifact(data)
+
+            self.assertEqual(
+                artifact["recognition"]["profile_id"],
+                "baseline-remediation-report",
+            )
+            self.assertEqual(artifact["relevance"]["disposition"], "accepted")
+
+    def test_security_reference_article_remains_ambiguous(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            report = root / "reference.docx"
+            write_docx(
+                report,
+                "".join(
+                    [
+                        paragraph("一、漏洞简介"),
+                        paragraph("二、漏洞影响"),
+                        paragraph("三、复现过程"),
+                        paragraph("修复建议"),
+                    ]
+                ),
+            )
+            data = root / "data"
+            result = self.run_tool(data, "scan", "--quiet", str(report))
+
+            self.assertIn('"ambiguous": 1', result.stdout)
+            index = data / "report-ingestion" / "index.jsonl"
+            self.assertEqual(index.read_text(encoding="utf-8"), "")
+
     def test_search_uses_exact_system_and_excludes_unrelated_reports(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

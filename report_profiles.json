@@ -154,6 +154,57 @@
         "手工复现"
       ],
       "minimum_signals": 3
+    },
+    {
+      "id": "security-issue-ledger",
+      "version": 1,
+      "signals": [
+        "测试系统",
+        "问题标识",
+        "问题描述",
+        "问题等级",
+        "问题状态",
+        "测试阶段"
+      ],
+      "minimum_signals": 4
+    },
+    {
+      "id": "baseline-remediation-report",
+      "version": 1,
+      "signals": [
+        "评估指标",
+        "评估项",
+        "不符合项",
+        "加固建议",
+        "加固情况",
+        "加固前",
+        "加固后"
+      ],
+      "minimum_signals": 5
+    },
+    {
+      "id": "network-security-maintenance",
+      "version": 1,
+      "signals": [
+        "网络核心设备维护记录表",
+        "设备运行状况",
+        "日志与告警",
+        "网络安全",
+        "巡检问题及建议"
+      ],
+      "minimum_signals": 4
+    },
+    {
+      "id": "api-fuzzer-report",
+      "version": 1,
+      "signals": [
+        "平台API模糊检测报告",
+        "Packer Fuzzer检测报告",
+        "API清单",
+        "安全建议",
+        "当前网站资源树如下"
+      ],
+      "minimum_signals": 4
     }
   ]
 }
