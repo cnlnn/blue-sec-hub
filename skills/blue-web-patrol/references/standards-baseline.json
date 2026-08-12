@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "standards": [
+    {
+      "id": "owasp-wstg",
+      "name": "OWASP Web Security Testing Guide",
+      "version": "4.2",
+      "role": "coverage-baseline",
+      "source_url": "https://github.com/OWASP/wstg.git",
+      "source_ref": "v4.2",
+      "source_commit": "dd33419e10edb22b78d89325a6c2aad9f184e3a2"
+    },
+    {
+      "id": "owasp-asvs",
+      "name": "OWASP Application Security Verification Standard",
+      "version": "5.0.0",
+      "role": "coverage-baseline",
+      "source_url": "https://github.com/OWASP/ASVS.git",
+      "source_ref": "v5.0.0_release",
+      "source_commit": "5cf9b032440be53ce345ab3c130fda46ba1ce7a2"
+    },
+    {
+      "id": "owasp-api-security-top-10",
+      "name": "OWASP API Security Top 10",
+      "version": "2023",
+      "role": "risk-overlay",
+      "source_url": "https://github.com/OWASP/API-Security.git",
+      "source_ref": "master@2026-07-25",
+      "source_commit": "e85ddfa5a936d4656840ac250c039c7057e66b0d"
+    },
+    {
+      "id": "owasp-top-10",
+      "name": "OWASP Top 10",
+      "version": "2025",
+      "role": "risk-overlay",
+      "source_url": "https://github.com/OWASP/Top10.git",
+      "source_ref": "master@2026-07-25",
+      "source_commit": "839169cad15199176f462616b891a1588265cde8"
+    }
+  ]
+}

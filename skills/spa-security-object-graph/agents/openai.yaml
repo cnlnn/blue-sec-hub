@@ -1,0 +1,4 @@
+interface:
+  display_name: "SPA 安全对象图谱"
+  short_description: "从任意 SPA 还原对象、控制边界和跨功能安全链路"
+  default_prompt: "使用 $spa-security-object-graph 基于结构证据和双语语义分析目标站点或本地 SPA 资源，建立通用对象图并给出证据分级的控制边界与组合链候选。"

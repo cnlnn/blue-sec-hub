@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "taxonomy_version": 1,
+  "categories": {
+    "write_action": {
+      "create": ["create", "add", "new", "save", "insert", "register", "创建", "新增", "新建", "注册"],
+      "update": ["update", "edit", "modify", "change", "set", "bind", "assign", "更新", "编辑", "修改", "变更", "绑定", "分配"],
+      "submit": ["submit", "commit", "apply", "send", "提交", "申请", "发送"],
+      "delete": ["delete", "remove", "destroy", "revoke", "删除", "移除", "撤销"],
+      "upload": ["upload", "import", "上传", "导入"],
+      "execute": ["run", "execute", "invoke", "trigger", "dispatch", "运行", "执行", "调用", "触发", "调度"]
+    },
+    "read_action": {
+      "list": ["list", "page", "query", "search", "find", "列表", "分页", "查询", "搜索"],
+      "detail": ["detail", "info", "view", "get", "详情", "信息", "查看", "获取"],
+      "download": ["download", "export", "下载", "导出"],
+      "preview": ["preview", "render", "预览", "渲染"],
+      "history": ["history", "record", "audit", "log", "历史", "记录", "审计", "日志"]
+    },
+    "lifecycle_action": {
+      "start": ["start", "launch", "enable", "activate", "publish", "deploy", "开始", "启动", "启用", "激活", "发布", "部署"],
+      "stop": ["stop", "disable", "deactivate", "pause", "停止", "停用", "禁用", "暂停"],
+      "continue": ["continue", "resume", "renew", "retry", "继续", "恢复", "续期", "重试"],
+      "finish": ["finish", "complete", "close", "archive", "terminate", "完成", "关闭", "归档", "终止"],
+      "cancel": ["cancel", "rollback", "restore", "取消", "回滚", "还原"]
+    },
+    "actor": {
+      "user": ["user", "account", "profile", "用户", "账号", "账户"],
+      "member": ["member", "employee", "staff", "成员", "员工", "人员"],
+      "administrator": ["admin", "administrator", "operator", "管理员", "运维员", "操作员"],
+      "service": ["service account", "system account", "machine user", "服务账号", "系统账号"]
+    },
+    "business_object": {
+      "identity": ["identity", "credential", "session", "token", "secret", "身份", "凭据", "会话", "令牌", "密钥"],
+      "organization": ["tenant", "organization", "department", "team", "group", "租户", "组织", "部门", "团队", "群组"],
+      "authorization": ["role", "permission", "policy", "privilege", "角色", "权限", "策略", "特权"],
+      "customer": ["customer", "contact", "client", "客户", "联系人"],
+      "transaction": ["order", "invoice", "payment", "refund", "balance", "订单", "账单", "支付", "退款", "余额"],
+      "workflow": ["workflow", "process", "approval", "application", "ticket", "工作流", "流程", "审批", "申请单", "工单"],
+      "project": ["project", "task", "job", "plan", "event", "项目", "任务", "作业", "计划", "活动"],
+      "content": ["article", "message", "comment", "notice", "report", "文章", "消息", "评论", "公告", "报告"],
+      "asset": ["asset", "device", "product", "inventory", "资产", "设备", "产品", "库存"],
+      "file": ["file", "document", "attachment", "image", "archive", "文件", "文档", "附件", "图片", "压缩包"],
+      "data": ["data", "dataset", "record", "table", "数据", "数据集", "记录", "表"]
+    },
+    "resource": {
+      "compute": ["runtime", "compute", "container", "notebook", "runner", "virtual machine", "instance", "运行环境", "计算资源", "容器", "笔记本", "执行器", "虚拟机", "实例"],
+      "deployment": ["deployment", "release", "environment", "cluster", "部署", "发布版本", "环境", "集群"],
+      "storage": ["storage", "bucket", "repository", "database", "cache", "存储", "存储桶", "仓库", "数据库", "缓存"],
+      "processor": ["parser", "converter", "renderer", "compiler", "worker", "解析器", "转换器", "渲染器", "编译器", "工作节点"],
+      "communication": ["mail", "sms", "notification", "webhook", "邮件", "短信", "通知", "回调"],
+      "interface": ["console", "terminal", "dashboard", "address", "控制台", "终端", "仪表盘", "访问地址"]
+    },
+    "gate": {
+      "authentication": ["authentication", "login", "session", "认证", "登录", "会话"],
+      "authorization": ["authorization", "permission", "role", "privilege", "授权", "权限", "角色", "特权"],
+      "ownership": ["owner", "ownership", "belong", "所有者", "所有权", "归属"],
+      "tenant": ["tenant", "organization", "department", "租户", "组织", "部门"],
+      "membership": ["member", "membership", "team", "成员", "成员关系", "团队"],
+      "approval": ["approval", "audit", "review", "qualification", "审批", "审核", "复核", "资格"],
+      "entitlement": ["entitlement", "subscription", "license", "plan", "授权额度", "订阅", "许可证", "套餐"],
+      "capacity": ["quota", "limit", "balance", "amount", "price", "配额", "限制", "余额", "金额", "价格"],
+      "state": ["state", "status", "phase", "enabled", "状态", "阶段", "启用状态"],
+      "time": ["time", "duration", "expiry", "deadline", "时间", "时长", "过期时间", "截止时间"]
+    },
+    "public_boundary": {
+      "anonymous": ["anonymous", "guest", "without auth", "unauthenticated", "匿名", "游客", "免登录", "未认证"],
+      "public": ["public", "open", "catalog", "公开", "开放", "目录"],
+      "shared": ["shared", "share", "external", "共享", "分享", "外部"]
+    },
+    "sensitive_capability": {
+      "administration": ["administration", "manage", "configuration", "管理", "配置"],
+      "credential-access": ["credential", "token", "secret", "password", "凭据", "令牌", "密钥", "密码"],
+      "personal-data": ["personal data", "privacy", "phone", "identity number", "个人信息", "隐私", "手机号", "证件号"],
+      "financial": ["payment", "refund", "invoice", "balance", "支付", "退款", "账单", "余额"],
+      "file-transfer": ["upload", "download", "import", "export", "上传", "下载", "导入", "导出"],
+      "execution": ["execute", "command", "script", "code", "执行", "命令", "脚本", "代码"],
+      "messaging": ["mail", "sms", "notification", "webhook", "邮件", "短信", "通知", "回调"]
+    }
+  }
+}

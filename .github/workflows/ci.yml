@@ -1,0 +1,271 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONUTF8: "1"
+
+jobs:
+  impact:
+    runs-on: ubuntu-24.04
+    outputs:
+      unit: ${{ steps.classify.outputs.unit }}
+      os_matrix: ${{ steps.classify.outputs.os_matrix }}
+      platform_matrix: ${{ steps.classify.outputs.platform_matrix }}
+      platforms: ${{ steps.classify.outputs.platforms }}
+      level: ${{ steps.classify.outputs.level }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Classify change impact
+        id: classify
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            result=$(python scripts/change_impact.py --path scripts/install.py --json)
+          else
+            if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+              base="${{ github.event.pull_request.base.sha }}"
+            else
+              base="${{ github.event.before }}"
+            fi
+            if [[ -z "$base" || "$base" == "0000000000000000000000000000000000000000" ]]; then
+              if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+                base="HEAD^"
+              else
+                result=$(python scripts/change_impact.py --path scripts/install.py --json)
+              fi
+            fi
+            if [[ -z "${result:-}" ]]; then
+              result=$(python scripts/change_impact.py --base "$base" --json)
+            fi
+          fi
+          python - "$result" >> "$GITHUB_OUTPUT" <<'PY'
+          import json
+          import sys
+          value = json.loads(sys.argv[1])
+          print(f"level={value['level']}")
+          print(f"unit={str(value['gates']['unit']).lower()}")
+          print(f"os_matrix={str(value['gates']['os_matrix']).lower()}")
+          print(f"platform_matrix={str(value['gates']['platform_matrix']).lower()}")
+          print("platforms=" + json.dumps(value["platforms"], separators=(",", ":")))
+          PY
+
+  content:
+    needs: impact
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Validate content plane
+        run: python scripts/validate_content.py
+
+  unit-linux:
+    if: needs.impact.outputs.unit == 'true' && needs.impact.outputs.os_matrix != 'true'
+    needs: impact
+    runs-on: ubuntu-24.04
+    env:
+      BLUE_SEC_CACHE: ${{ github.workspace }}/.ci-state/cache
+      BLUE_SEC_CONFIG: ${{ github.workspace }}/.ci-state/config
+      BLUE_SEC_DATA: ${{ github.workspace }}/.ci-state/data
+      CODEX_HOME: ${{ github.workspace }}/.ci-state/codex-home
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Validate functional data
+        run: python scripts/validate.py --offline
+
+  validate:
+    if: needs.impact.outputs.os_matrix == 'true'
+    needs: impact
+    name: ${{ matrix.os }} / Python ${{ matrix.python }} / no uv
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-2025]
+        python: ["3.11", "3.12", "3.13", "3.14"]
+    env:
+      BLUE_SEC_CACHE: ${{ github.workspace }}/.ci-state/cache
+      BLUE_SEC_CONFIG: ${{ github.workspace }}/.ci-state/config
+      BLUE_SEC_DATA: ${{ github.workspace }}/.ci-state/data
+      CODEX_HOME: ${{ github.workspace }}/.ci-state/codex-home
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Verify standard-library runtime
+        run: python scripts/bootstrap.py
+      - name: Validate repository offline
+        run: python scripts/validate.py --offline
+      - name: Run unit tests without a package manager
+        run: python -m unittest discover -s tests
+
+  platform-contract:
+    if: needs.impact.outputs.platform_matrix == 'true'
+    needs: impact
+    name: Platform contract / ${{ matrix.platform }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ${{ fromJSON(needs.impact.outputs.platforms) }}
+    env:
+      BLUE_SEC_BIN: ${{ github.workspace }}/.platform-state/bin
+      BLUE_SEC_CACHE: ${{ github.workspace }}/.platform-state/cache
+      BLUE_SEC_CONFIG: ${{ github.workspace }}/.platform-state/config
+      BLUE_SEC_DATA: ${{ github.workspace }}/.platform-state/data
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Verify install, upgrade, Doctor, and rollback contracts
+        shell: bash
+        env:
+          HOME: ${{ github.workspace }}/.platform-state/home
+        run: |
+          python scripts/install.py --platform "${{ matrix.platform }}"
+          python scripts/install.py --platform "${{ matrix.platform }}"
+          python scripts/doctor.py --platform "${{ matrix.platform }}" --json > doctor.json
+          python - "${{ matrix.platform }}" <<'PY'
+          import json
+          import sys
+          result = json.load(open("doctor.json", encoding="utf-8"))["platforms"][sys.argv[1]]
+          assert result["capabilities"]["skills"] == "ready"
+          PY
+          python scripts/install.py --platform "${{ matrix.platform }}" --uninstall
+
+  chromium-integration:
+    if: needs.impact.outputs.os_matrix == 'true'
+    needs: impact
+    runs-on: ubuntu-24.04
+    env:
+      BLUE_SEC_BROWSER_TESTS: "1"
+      BLUE_SEC_CACHE: ${{ github.workspace }}/.ci-state/cache
+      BLUE_SEC_CONFIG: ${{ github.workspace }}/.ci-state/config
+      BLUE_SEC_DATA: ${{ github.workspace }}/.ci-state/data
+      CODEX_HOME: ${{ github.workspace }}/.ci-state/codex-home
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Install browser runtime
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check "playwright>=1.50,<2"
+          .venv/bin/python -m playwright install --with-deps chromium
+      - name: Run real Chromium integration
+        run: python -m unittest tests.test_web_runner_browser tests.test_fast_find_closed_loop
+
+  knowledge-integration:
+    if: needs.impact.outputs.level == 'core-runtime' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: impact
+    runs-on: ubuntu-24.04
+    env:
+      BLUE_SEC_KNOWLEDGE_INTEGRATION: "1"
+      BLUE_SEC_CACHE: ${{ github.workspace }}/.ci-state/cache
+      BLUE_SEC_CONFIG: ${{ github.workspace }}/.ci-state/config
+      BLUE_SEC_DATA: ${{ github.workspace }}/.ci-state/data
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Install isolated document readers
+        run: |
+          # Ubuntu 24.04 AppArmor blocks the unprivileged user namespace that
+          # bubblewrap needs. This runner is ephemeral and contains no secrets.
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap libreoffice-calc p7zip-full tesseract-ocr tesseract-ocr-chi-sim
+      - name: Run document isolation integration
+        run: python -m unittest tests.test_knowledge_distillation_integration
+
+  uv-compatibility:
+    if: needs.impact.outputs.os_matrix == 'true'
+    needs: impact
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Set up optional uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+      - name: Verify optional uv path
+        run: |
+          uv sync --locked
+          uv run python scripts/validate.py --offline
+
+  payload-corpus-integration:
+    if: needs.impact.outputs.level == 'core-runtime' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: impact
+    runs-on: ubuntu-24.04
+    env:
+      BLUE_SEC_CACHE: ${{ github.workspace }}/.ci-state/cache
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Check out pinned payload corpus
+        shell: bash
+        run: |
+          commit=$(python -c "import json; print(json.load(open('sources.lock.json'))['sources']['payloads-all-the-things']['commit'])")
+          mkdir -p .ci-state/payload-source
+          git -C .ci-state/payload-source init
+          git -C .ci-state/payload-source remote add origin https://github.com/swisskyrepo/PayloadsAllTheThings.git
+          git -C .ci-state/payload-source fetch --depth 1 origin "$commit"
+          git -C .ci-state/payload-source checkout --detach FETCH_HEAD
+      - name: Build and verify full payload catalog
+        run: |
+          python scripts/payload_catalog.py sync --source .ci-state/payload-source --force
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          summary = json.loads(Path('.ci-state/cache/upstreams/payloads-all-the-things/summary.json').read_text())
+          assert summary['files'] >= 400
+          assert summary['techniques'] >= 1000
+          assert summary['payloads'] >= 10000
+          assert summary['automatic_execution_approved'] == 0
+          PY

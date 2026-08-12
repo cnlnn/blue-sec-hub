@@ -1,0 +1,4 @@
+.work/
+.venv/
+sources.lock.json.tmp
+__pycache__/

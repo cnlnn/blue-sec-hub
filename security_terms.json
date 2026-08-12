@@ -1,0 +1,951 @@
+{
+  "schema_version": 1,
+  "terms": [
+    {
+      "id": "broken-access-control",
+      "category": "access-control",
+      "triggers": [
+        "越权",
+        "访问控制缺陷",
+        "broken access control"
+      ],
+      "aliases": [
+        "越权",
+        "访问控制",
+        "权限绕过",
+        "broken access control",
+        "authorization bypass",
+        "IDOR",
+        "BOLA",
+        "BFLA"
+      ]
+    },
+    {
+      "id": "object-authorization",
+      "category": "access-control",
+      "triggers": [
+        "水平越权",
+        "对象越权",
+        "对象级授权",
+        "IDOR",
+        "BOLA",
+        "CWE-639"
+      ],
+      "aliases": [
+        "水平越权",
+        "对象越权",
+        "对象级授权",
+        "IDOR",
+        "BOLA",
+        "insecure direct object reference",
+        "broken object level authorization",
+        "object-level authorization",
+        "CWE-639"
+      ]
+    },
+    {
+      "id": "function-authorization",
+      "category": "access-control",
+      "triggers": [
+        "垂直越权",
+        "功能级越权",
+        "BFLA"
+      ],
+      "aliases": [
+        "垂直越权",
+        "功能级越权",
+        "BFLA",
+        "broken function level authorization",
+        "function-level authorization"
+      ]
+    },
+    {
+      "id": "unauthenticated-access",
+      "category": "authentication",
+      "triggers": [
+        "未授权访问",
+        "未鉴权",
+        "unauthenticated access"
+      ],
+      "aliases": [
+        "未授权访问",
+        "未鉴权",
+        "缺少认证",
+        "unauthenticated access",
+        "missing authentication",
+        "anonymous access"
+      ]
+    },
+    {
+      "id": "authentication-bypass",
+      "category": "authentication",
+      "triggers": [
+        "认证绕过",
+        "鉴权绕过",
+        "authentication bypass"
+      ],
+      "aliases": [
+        "认证绕过",
+        "鉴权绕过",
+        "身份验证绕过",
+        "authentication bypass",
+        "auth bypass"
+      ]
+    },
+    {
+      "id": "sql-injection",
+      "category": "injection",
+      "triggers": [
+        "SQL注入",
+        "SQL 注入",
+        "SQLi",
+        "SQL injection"
+      ],
+      "aliases": [
+        "SQL注入",
+        "SQL 注入",
+        "SQLi",
+        "SQL injection",
+        "CWE-89"
+      ]
+    },
+    {
+      "id": "cross-site-scripting",
+      "category": "injection",
+      "triggers": [
+        "跨站脚本",
+        "XSS",
+        "cross-site scripting"
+      ],
+      "aliases": [
+        "跨站脚本",
+        "XSS",
+        "cross-site scripting",
+        "stored XSS",
+        "reflected XSS",
+        "DOM XSS",
+        "CWE-79"
+      ]
+    },
+    {
+      "id": "server-side-request-forgery",
+      "category": "injection",
+      "triggers": [
+        "服务端请求伪造",
+        "SSRF",
+        "server-side request forgery"
+      ],
+      "aliases": [
+        "服务端请求伪造",
+        "SSRF",
+        "server-side request forgery",
+        "CWE-918"
+      ]
+    },
+    {
+      "id": "command-injection",
+      "category": "injection",
+      "triggers": [
+        "命令注入",
+        "command injection",
+        "OS command injection"
+      ],
+      "aliases": [
+        "命令注入",
+        "系统命令注入",
+        "command injection",
+        "OS command injection",
+        "CWE-78"
+      ]
+    },
+    {
+      "id": "remote-code-execution",
+      "category": "execution",
+      "triggers": [
+        "远程代码执行",
+        "代码执行",
+        "RCE",
+        "remote code execution"
+      ],
+      "aliases": [
+        "远程代码执行",
+        "代码执行",
+        "RCE",
+        "remote code execution",
+        "arbitrary code execution"
+      ]
+    },
+    {
+      "id": "path-traversal",
+      "category": "file",
+      "triggers": [
+        "目录穿越",
+        "路径穿越",
+        "path traversal",
+        "directory traversal"
+      ],
+      "aliases": [
+        "目录穿越",
+        "路径穿越",
+        "path traversal",
+        "directory traversal",
+        "dot-dot-slash",
+        "CWE-22"
+      ]
+    },
+    {
+      "id": "local-file-inclusion",
+      "category": "file",
+      "triggers": [
+        "本地文件包含",
+        "LFI",
+        "local file inclusion"
+      ],
+      "aliases": [
+        "本地文件包含",
+        "LFI",
+        "local file inclusion",
+        "file inclusion",
+        "CWE-98"
+      ]
+    },
+    {
+      "id": "arbitrary-file-read",
+      "category": "file",
+      "triggers": [
+        "任意文件读取",
+        "arbitrary file read"
+      ],
+      "aliases": [
+        "任意文件读取",
+        "文件读取",
+        "arbitrary file read",
+        "arbitrary file disclosure"
+      ]
+    },
+    {
+      "id": "unrestricted-file-upload",
+      "category": "file",
+      "triggers": [
+        "任意文件上传",
+        "文件上传",
+        "unrestricted file upload"
+      ],
+      "aliases": [
+        "任意文件上传",
+        "文件上传",
+        "unrestricted file upload",
+        "unrestricted upload",
+        "CWE-434"
+      ]
+    },
+    {
+      "id": "cross-site-request-forgery",
+      "category": "request",
+      "triggers": [
+        "跨站请求伪造",
+        "CSRF",
+        "cross-site request forgery"
+      ],
+      "aliases": [
+        "跨站请求伪造",
+        "CSRF",
+        "cross-site request forgery",
+        "CWE-352"
+      ]
+    },
+    {
+      "id": "http-request-smuggling",
+      "category": "request",
+      "triggers": [
+        "请求走私",
+        "HTTP request smuggling"
+      ],
+      "aliases": [
+        "请求走私",
+        "HTTP request smuggling",
+        "request smuggling",
+        "CL.TE",
+        "TE.CL",
+        "CWE-444"
+      ]
+    },
+    {
+      "id": "insecure-deserialization",
+      "category": "injection",
+      "triggers": [
+        "不安全反序列化",
+        "反序列化",
+        "insecure deserialization"
+      ],
+      "aliases": [
+        "不安全反序列化",
+        "反序列化",
+        "insecure deserialization",
+        "deserialization",
+        "CWE-502"
+      ]
+    },
+    {
+      "id": "xml-external-entity",
+      "category": "injection",
+      "triggers": [
+        "XML外部实体",
+        "XXE",
+        "XML external entity"
+      ],
+      "aliases": [
+        "XML外部实体",
+        "XXE",
+        "XML external entity",
+        "external entity injection",
+        "CWE-611"
+      ]
+    },
+    {
+      "id": "server-side-template-injection",
+      "category": "injection",
+      "triggers": [
+        "服务端模板注入",
+        "模板注入",
+        "SSTI",
+        "server-side template injection"
+      ],
+      "aliases": [
+        "服务端模板注入",
+        "模板注入",
+        "SSTI",
+        "server-side template injection"
+      ]
+    },
+    {
+      "id": "jwt-security",
+      "category": "authentication",
+      "triggers": [
+        "JWT安全",
+        "JWT漏洞",
+        "JWT",
+        "JSON Web Token"
+      ],
+      "aliases": [
+        "JWT安全",
+        "JWT漏洞",
+        "JSON Web Token",
+        "JWT",
+        "alg none",
+        "algorithm confusion",
+        "weak JWT secret"
+      ]
+    },
+    {
+      "id": "oauth-security",
+      "category": "authentication",
+      "triggers": [
+        "OAuth安全",
+        "OAuth漏洞",
+        "OAuth"
+      ],
+      "aliases": [
+        "OAuth安全",
+        "OAuth漏洞",
+        "OAuth",
+        "OIDC",
+        "OpenID Connect",
+        "redirect_uri",
+        "authorization code"
+      ]
+    },
+    {
+      "id": "race-condition",
+      "category": "business-logic",
+      "triggers": [
+        "竞态条件",
+        "条件竞争",
+        "race condition"
+      ],
+      "aliases": [
+        "竞态条件",
+        "条件竞争",
+        "并发漏洞",
+        "race condition",
+        "TOCTOU",
+        "CWE-362"
+      ]
+    },
+    {
+      "id": "open-redirect",
+      "category": "request",
+      "triggers": [
+        "开放重定向",
+        "任意跳转",
+        "open redirect"
+      ],
+      "aliases": [
+        "开放重定向",
+        "任意跳转",
+        "URL跳转",
+        "open redirect",
+        "unvalidated redirect",
+        "CWE-601"
+      ]
+    },
+    {
+      "id": "information-disclosure",
+      "category": "exposure",
+      "triggers": [
+        "信息泄露",
+        "敏感信息泄露",
+        "information disclosure"
+      ],
+      "aliases": [
+        "信息泄露",
+        "敏感信息泄露",
+        "information disclosure",
+        "sensitive data exposure",
+        "CWE-200"
+      ]
+    },
+    {
+      "id": "cors-misconfiguration",
+      "category": "configuration",
+      "triggers": [
+        "CORS配置错误",
+        "跨域配置",
+        "CORS misconfiguration"
+      ],
+      "aliases": [
+        "CORS配置错误",
+        "跨域配置",
+        "CORS misconfiguration",
+        "Access-Control-Allow-Origin",
+        "CWE-942"
+      ]
+    },
+    {
+      "id": "business-logic",
+      "category": "business-logic",
+      "triggers": [
+        "业务逻辑漏洞",
+        "逻辑漏洞",
+        "business logic"
+      ],
+      "aliases": [
+        "业务逻辑漏洞",
+        "逻辑漏洞",
+        "business logic",
+        "workflow bypass",
+        "state machine"
+      ]
+    },
+    {
+      "id": "nosql-injection",
+      "category": "injection",
+      "triggers": [
+        "NoSQL注入",
+        "NoSQL 注入",
+        "NoSQL injection"
+      ],
+      "aliases": [
+        "NoSQL注入",
+        "NoSQL 注入",
+        "NoSQL injection",
+        "MongoDB operator injection",
+        "CWE-943"
+      ]
+    },
+    {
+      "id": "prototype-pollution",
+      "category": "injection",
+      "triggers": [
+        "原型污染",
+        "prototype pollution"
+      ],
+      "aliases": [
+        "原型污染",
+        "prototype pollution",
+        "JavaScript prototype pollution",
+        "CWE-1321"
+      ]
+    },
+    {
+      "id": "mass-assignment",
+      "category": "access-control",
+      "triggers": [
+        "批量赋值",
+        "属性自动绑定",
+        "mass assignment"
+      ],
+      "aliases": [
+        "批量赋值",
+        "属性自动绑定",
+        "mass assignment",
+        "autobinding",
+        "over-posting",
+        "CWE-915"
+      ]
+    },
+    {
+      "id": "web-cache-deception",
+      "category": "cache",
+      "triggers": [
+        "Web缓存欺骗",
+        "缓存欺骗",
+        "web cache deception"
+      ],
+      "aliases": [
+        "Web缓存欺骗",
+        "缓存欺骗",
+        "web cache deception",
+        "cache deception"
+      ]
+    },
+    {
+      "id": "web-cache-poisoning",
+      "category": "cache",
+      "triggers": [
+        "Web缓存投毒",
+        "缓存投毒",
+        "web cache poisoning"
+      ],
+      "aliases": [
+        "Web缓存投毒",
+        "缓存投毒",
+        "web cache poisoning",
+        "cache poisoning"
+      ]
+    },
+    {
+      "id": "prompt-injection",
+      "category": "ai-security",
+      "triggers": [
+        "提示词注入",
+        "提示注入",
+        "prompt injection"
+      ],
+      "aliases": [
+        "提示词注入",
+        "提示注入",
+        "prompt injection",
+        "LLM prompt injection",
+        "indirect prompt injection",
+        "CWE-1427"
+      ]
+    },
+    {
+      "id": "subdomain-takeover",
+      "category": "configuration",
+      "triggers": [
+        "子域名接管",
+        "subdomain takeover"
+      ],
+      "aliases": [
+        "子域名接管",
+        "subdomain takeover",
+        "dangling DNS",
+        "dangling CNAME"
+      ]
+    },
+    {
+      "id": "host-header-injection",
+      "category": "request",
+      "triggers": [
+        "Host头注入",
+        "主机头注入",
+        "host header injection"
+      ],
+      "aliases": [
+        "Host头注入",
+        "主机头注入",
+        "host header injection",
+        "host header attack",
+        "password reset poisoning"
+      ]
+    },
+    {
+      "id": "crlf-injection",
+      "category": "injection",
+      "triggers": [
+        "CRLF注入",
+        "响应拆分",
+        "CRLF injection"
+      ],
+      "aliases": [
+        "CRLF注入",
+        "响应拆分",
+        "CRLF injection",
+        "HTTP response splitting",
+        "CWE-113"
+      ]
+    },
+    {
+      "id": "clickjacking",
+      "category": "browser",
+      "triggers": [
+        "点击劫持",
+        "clickjacking"
+      ],
+      "aliases": [
+        "点击劫持",
+        "clickjacking",
+        "UI redressing",
+        "CWE-1021"
+      ]
+    },
+    {
+      "id": "dependency-confusion",
+      "category": "supply-chain",
+      "triggers": [
+        "依赖混淆",
+        "dependency confusion"
+      ],
+      "aliases": [
+        "依赖混淆",
+        "dependency confusion",
+        "substitution attack",
+        "CWE-427"
+      ]
+    },
+    {
+      "id": "weak-credentials",
+      "category": "authentication",
+      "triggers": [
+        "弱口令",
+        "默认口令",
+        "weak password",
+        "default credentials"
+      ],
+      "aliases": [
+        "弱口令",
+        "默认口令",
+        "弱凭据",
+        "weak password",
+        "weak credentials",
+        "default credentials",
+        "CWE-521",
+        "CWE-1392"
+      ]
+    },
+    {
+      "id": "privilege-escalation",
+      "category": "system-security",
+      "triggers": [
+        "权限提升",
+        "本地提权",
+        "privilege escalation"
+      ],
+      "aliases": [
+        "权限提升",
+        "本地提权",
+        "系统提权",
+        "privilege escalation",
+        "local privilege escalation",
+        "LPE"
+      ]
+    },
+    {
+      "id": "graphql-security",
+      "category": "protocol",
+      "canonicalize": false,
+      "triggers": [
+        "GraphQL安全",
+        "GraphQL漏洞",
+        "GraphQL security"
+      ],
+      "aliases": [
+        "GraphQL安全",
+        "GraphQL漏洞",
+        "GraphQL security",
+        "GraphQL introspection",
+        "GraphQL batching"
+      ]
+    },
+    {
+      "id": "websocket-security",
+      "category": "protocol",
+      "canonicalize": false,
+      "triggers": [
+        "WebSocket安全",
+        "WebSocket漏洞",
+        "WebSocket security",
+        "CSWSH"
+      ],
+      "aliases": [
+        "WebSocket安全",
+        "WebSocket漏洞",
+        "WebSocket security",
+        "CSWSH",
+        "cross-site WebSocket hijacking"
+      ]
+    },
+    {
+      "id": "waf-bypass-techniques",
+      "category": "emerging",
+      "triggers": [
+        "WAF Bypass Techniques"
+      ],
+      "aliases": [
+        "WAF Bypass Techniques",
+        "waf bypass techniques"
+      ],
+      "routing_aliases": ["WAF Bypass Techniques", "waf bypass techniques"],
+      "search_aliases": ["WAF"]
+    },
+    {
+      "id": "format-string-exploitation",
+      "category": "emerging",
+      "triggers": [
+        "Format String Exploitation"
+      ],
+      "aliases": [
+        "Format String Exploitation",
+        "format string exploitation"
+      ]
+    },
+    {
+      "id": "email-header-injection",
+      "category": "emerging",
+      "triggers": [
+        "Email Header Injection"
+      ],
+      "aliases": [
+        "Email Header Injection",
+        "email header injection"
+      ]
+    },
+    {
+      "id": "saml-sso-and-assertion-attacks",
+      "category": "emerging",
+      "triggers": [
+        "SAML SSO and Assertion Attacks"
+      ],
+      "aliases": [
+        "SAML SSO and Assertion Attacks",
+        "Assertion Attacks",
+        "SAML",
+        "SAML SSO",
+        "saml sso assertion attacks"
+      ],
+      "routing_aliases": ["SAML SSO and Assertion Attacks", "Assertion Attacks", "SAML SSO", "saml sso assertion attacks"],
+      "search_aliases": ["SAML", "SSO"]
+    },
+    {
+      "id": "session-hijacking",
+      "category": "emerging",
+      "triggers": [
+        "Session Hijacking"
+      ],
+      "aliases": [
+        "Session Hijacking"
+      ]
+    },
+    {
+      "id": "client-side-url-redirect",
+      "category": "emerging",
+      "triggers": [
+        "Client-side URL Redirect"
+      ],
+      "aliases": [
+        "Client-side URL Redirect"
+      ],
+      "routing_aliases": ["Client-side URL Redirect"],
+      "search_aliases": ["URL"]
+    },
+    {
+      "id": "client-side-template-injection",
+      "category": "emerging",
+      "triggers": [
+        "Client-side Template Injection"
+      ],
+      "aliases": [
+        "Client-side Template Injection"
+      ]
+    },
+    {
+      "id": "weak-password-change-or-reset-functionalities",
+      "category": "emerging",
+      "triggers": [
+        "Weak Password Change or Reset Functionalities"
+      ],
+      "aliases": [
+        "Weak Password Change or Reset Functionalities"
+      ]
+    },
+    {
+      "id": "csp-bypass",
+      "category": "emerging",
+      "triggers": [
+        "CSP Bypass"
+      ],
+      "aliases": [
+        "CSP Bypass",
+        "CSP",
+        "csp bypass advanced"
+      ]
+    },
+    {
+      "id": "weak-authentication-methods",
+      "category": "emerging",
+      "triggers": [
+        "Weak Authentication Methods"
+      ],
+      "aliases": [
+        "Weak Authentication Methods"
+      ]
+    },
+    {
+      "id": "jndi-injection",
+      "category": "emerging",
+      "triggers": [
+        "JNDI Injection"
+      ],
+      "aliases": [
+        "JNDI Injection",
+        "JNDI",
+        "jndi injection"
+      ]
+    },
+    {
+      "id": "ad-acl-abuse",
+      "category": "emerging",
+      "triggers": [
+        "AD ACL Abuse"
+      ],
+      "aliases": [
+        "AD ACL Abuse",
+        "active directory acl abuse",
+        "active directory certificate services",
+        "AD CS Attack Playbook"
+      ],
+      "routing_aliases": ["AD ACL Abuse", "active directory acl abuse", "AD CS Attack Playbook"],
+      "search_aliases": ["AD", "ACL", "CS", "active directory certificate services"]
+    },
+    {
+      "id": "excessive-data-exposure",
+      "category": "emerging",
+      "triggers": [
+        "Excessive Data Exposure"
+      ],
+      "aliases": [
+        "Excessive Data Exposure"
+      ]
+    },
+    {
+      "id": "401-403-bypass-techniques",
+      "category": "emerging",
+      "triggers": [
+        "401/403 Bypass Techniques"
+      ],
+      "aliases": [
+        "401/403 Bypass Techniques",
+        "401 403 bypass techniques"
+      ]
+    },
+    {
+      "id": "ntlm-relay-and-authentication-coercion",
+      "category": "emerging",
+      "triggers": [
+        "NTLM Relay and Authentication Coercion"
+      ],
+      "aliases": [
+        "NTLM Relay and Authentication Coercion",
+        "Authentication Coercion",
+        "NTLM",
+        "NTLM Relay",
+        "ntlm relay coercion"
+      ]
+    },
+    {
+      "id": "dangling-markup-injection",
+      "category": "emerging",
+      "triggers": [
+        "Dangling Markup Injection"
+      ],
+      "aliases": [
+        "Dangling Markup Injection",
+        "dangling markup injection"
+      ]
+    },
+    {
+      "id": "weak-password-detection-credential-brute-force",
+      "category": "emerging",
+      "triggers": [
+        "Weak Password Detection / Credential Brute-Force"
+      ],
+      "aliases": [
+        "Weak Password Detection / Credential Brute-Force",
+        "Credential Brute-Force",
+        "Weak Password Detection",
+        "weak password detection"
+      ]
+    },
+    {
+      "id": "weaker-authentication-in-alternative-channel",
+      "category": "emerging",
+      "triggers": [
+        "Weaker Authentication in Alternative Channel"
+      ],
+      "aliases": [
+        "Weaker Authentication in Alternative Channel"
+      ]
+    },
+    {
+      "id": "prototype-pollution-advanced",
+      "category": "emerging",
+      "triggers": [
+        "Prototype Pollution Advanced"
+      ],
+      "aliases": [
+        "Prototype Pollution Advanced",
+        "prototype pollution advanced"
+      ]
+    },
+    {
+      "id": "unauthorized-access-to-common-services",
+      "category": "emerging",
+      "triggers": [
+        "Unauthorized Access to Common Services"
+      ],
+      "aliases": [
+        "Unauthorized Access to Common Services",
+        "unauthorized access common services"
+      ]
+    },
+    {
+      "id": "imap-smtp-injection",
+      "category": "emerging",
+      "triggers": [
+        "IMAP SMTP Injection"
+      ],
+      "aliases": [
+        "IMAP SMTP Injection"
+      ],
+      "routing_aliases": ["IMAP SMTP Injection"],
+      "search_aliases": ["IMAP", "SMTP"]
+    },
+    {
+      "id": "dns-rebinding",
+      "category": "emerging",
+      "triggers": [
+        "DNS Rebinding"
+      ],
+      "aliases": [
+        "DNS Rebinding",
+        "dns rebinding attacks"
+      ],
+      "routing_aliases": ["DNS Rebinding", "dns rebinding attacks"],
+      "search_aliases": ["DNS"]
+    },
+    {
+      "id": "xslt-injection",
+      "category": "emerging",
+      "triggers": [
+        "XSLT Injection"
+      ],
+      "aliases": [
+        "XSLT Injection",
+        "XSLT",
+        "xslt injection"
+      ]
+    }
+  ]
+}

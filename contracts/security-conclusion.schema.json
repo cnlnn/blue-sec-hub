@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blue-sec-hub.local/contracts/security-conclusion-v1.schema.json",
+  "title": "Blue Sec Hub Security Conclusion",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "claim_id",
+    "claim_kind",
+    "validation_state",
+    "title",
+    "evidence_refs",
+    "attacker_prerequisites",
+    "validation_dependencies",
+    "potential_impact",
+    "confirmed_impact",
+    "investigation_priority",
+    "formal_severity",
+    "next_actions",
+    "alternative_explanations",
+    "coverage_effect"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "claim_id": {"type": "string", "minLength": 1},
+    "claim_kind": {
+      "enum": ["historical-claim", "risk-signal", "static-capability", "incident-observation", "vulnerability"]
+    },
+    "validation_state": {
+      "enum": ["observed", "historical", "candidate", "confirmed", "rejected", "blocked-external"]
+    },
+    "title": {"type": "string", "minLength": 1},
+    "evidence_refs": {"type": "array", "items": {"type": "string"}},
+    "attacker_prerequisites": {"type": "array", "items": {"type": "string"}},
+    "attacker_model": {"type": "object"},
+    "validation_dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "status", "evidence_refs", "reason"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "status": {"enum": ["pending", "searching", "satisfied", "exhausted-with-evidence", "blocked-external"]},
+          "evidence_refs": {"type": "array", "items": {"type": "string"}},
+          "reason": {"type": ["string", "null"]}
+          ,"prerequisite_source": {"enum": ["attacker-public", "attacker-authenticated", "attacker-derived", "tester-provided", "historical-report", "internal-log", "source-code"]}
+        },
+        "additionalProperties": true
+      }
+    },
+    "potential_impact": {"type": ["string", "null"]},
+    "confirmed_impact": {"type": ["string", "null"]},
+    "investigation_priority": {"enum": ["critical", "high", "medium", "low", "informational"]},
+    "formal_severity": {"type": ["string", "null"]},
+    "reported_severity": {"type": ["string", "null"]},
+    "next_actions": {"type": "array", "items": {"type": "string"}},
+    "alternative_explanations": {"type": "array", "items": {"type": "string"}},
+    "coverage_effect": {"enum": ["none", "continue", "interim", "blocked", "complete"]},
+    "policy_violations": {"type": "array", "items": {"type": "string"}},
+    "original_title": {"type": ["string", "null"]}
+  },
+  "additionalProperties": true
+}

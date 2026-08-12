@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blue Report Intelligence"
+  short_description: "把历史漏洞报告转化为系统画像、绕过候选和可验证组合链"
+  default_prompt: "使用 $blue-report-intelligence 分析这些报告，建立系统漏洞画像，并找出同源漏洞、修复绕过和新旧漏洞组合候选。"

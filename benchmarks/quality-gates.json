@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "supported_scope": "safe-verifiable-web-api-spa",
+  "fixtures": [
+    "owasp-juice-shop",
+    "owasp-crapi",
+    "owasp-webgoat",
+    "blue-sec-minimal-spa-api"
+  ],
+  "gates": {
+    "minimum_recall": 0.8,
+    "minimum_precision": 0.98,
+    "maximum_first_result_seconds": 600,
+    "maximum_total_seconds": 5400,
+    "minimum_consecutive_runs": 3,
+    "required_platforms": ["linux", "macos", "windows"],
+    "required_agents": ["codex", "claude"],
+    "required_agent_contracts": [
+      "codex",
+      "claude",
+      "gemini",
+      "grok",
+      "opencode",
+      "openclaw",
+      "hermes",
+      "trae",
+      "trae-cn"
+    ]
+  }
+}

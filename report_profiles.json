@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "profile_set_version": 2,
+  "labels": {
+    "system_name": [
+      "目标系统名称",
+      "系统名称",
+      "测试系统",
+      "测试对象"
+    ],
+    "target": [
+      "测试目标",
+      "问题地址",
+      "目标地址",
+      "URL"
+    ],
+    "weakness": [
+      "攻击类型",
+      "漏洞类型",
+      "问题类型"
+    ],
+    "report_date": [
+      "制作日期",
+      "报告日期",
+      "测试日期"
+    ]
+  },
+  "profiles": [
+    {
+      "id": "attack-result-report",
+      "version": 1,
+      "signals": [
+        "攻击成果报告",
+        "攻击队伍",
+        "防守单位",
+        "目标系统名称",
+        "攻击路径"
+      ],
+      "minimum_signals": 2
+    },
+    {
+      "id": "standard-security-test",
+      "version": 1,
+      "signals": [
+        "安全测试结果详情",
+        "安全问题归纳",
+        "漏洞综述",
+        "安全测试对象",
+        "修复建议"
+      ],
+      "minimum_signals": 2
+    },
+    {
+      "id": "compact-finding-report",
+      "version": 1,
+      "signals": [
+        "主要工作成果",
+        "漏洞详情",
+        "测试目标",
+        "漏洞概述",
+        "测试过程"
+      ],
+      "minimum_signals": 2
+    },
+    {
+      "id": "issue-note",
+      "version": 1,
+      "signals": [
+        "问题地址",
+        "问题描述"
+      ],
+      "minimum_signals": 2
+    },
+    {
+      "id": "retest-report",
+      "version": 1,
+      "signals": [
+        "复测结论",
+        "复测结果",
+        "判定：",
+        "整改报告",
+        "整改结果"
+      ],
+      "minimum_signals": 2
+    },
+    {
+      "id": "phishing-exercise-report",
+      "version": 1,
+      "signals": [
+        "钓鱼邮件",
+        "钓鱼攻击",
+        "邮件投递",
+        "演练总结"
+      ],
+      "minimum_signals": 2
+    },
+    {
+      "id": "risk-assessment-report",
+      "version": 1,
+      "signals": [
+        "网络安全风险评估报告",
+        "风险评估",
+        "资产识别",
+        "风险分析"
+      ],
+      "minimum_signals": 2
+    }
+  ]
+}

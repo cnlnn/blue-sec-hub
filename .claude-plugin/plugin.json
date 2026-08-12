@@ -1,0 +1,8 @@
+{
+  "name": "blue-sec-hub",
+  "version": "0.8.0",
+  "description": "Cross-platform enterprise blue-team skills and a resumable Web assessment agent.",
+  "author": {"name": "Blue Sec Hub contributors", "url": "https://github.com/cnlnn/blue-sec-hub"},
+  "repository": "https://github.com/cnlnn/blue-sec-hub",
+  "license": "MIT"
+}

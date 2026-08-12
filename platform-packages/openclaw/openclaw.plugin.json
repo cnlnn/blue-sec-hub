@@ -1,0 +1,14 @@
+{
+  "id": "blue-sec-hub",
+  "name": "Blue Sec Hub",
+  "version": "0.8.0",
+  "skills": "../../skills",
+  "compaction": {
+    "memoryFlush": {
+      "enabled": true,
+      "systemPrompt": "Checkpoint the active Blue Sec Hub task workspace through checkpoint_security_context. Keep target-specific state out of global memory and reply NO_REPLY."
+    },
+    "beforeHook": "blue-sec-context-hook --platform openclaw --event session_before_compact",
+    "afterHook": "blue-sec-context-hook --platform openclaw --event session_after_compact"
+  }
+}

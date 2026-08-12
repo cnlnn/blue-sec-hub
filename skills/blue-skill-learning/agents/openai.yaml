@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blue Skill Learning"
+  short_description: "自动沉淀安全任务中的有效纠正并以本地补充保护上游同步"
+  default_prompt: "使用 $blue-skill-learning 识别这次迭代中可复用的改进，并按本地 Skill 或上游补充层安全沉淀。"

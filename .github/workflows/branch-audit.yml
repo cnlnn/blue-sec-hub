@@ -1,0 +1,44 @@
+name: Branch Audit
+
+on:
+  schedule:
+    - cron: "41 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out all history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Fetch branch references
+        shell: bash
+        run: git fetch origin '+refs/heads/*:refs/remotes/origin/*' --prune
+      - name: Generate branch continuity report
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          python scripts/branch_audit.py --github --json > branch-audit.json
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          value = json.loads(Path("branch-audit.json").read_text())
+          summary = value["summary"]
+          print("# Branch continuity")
+          print()
+          print(f"Base: `{value['base_commit']}`")
+          print(f"Ahead: {summary['ahead']}; without PR: {summary['without_pr']}; stale: {summary['stale']}; archive candidates: {summary['archive_candidates']}")
+          print()
+          print("| Branch | State | Ahead | Age | PR |")
+          print("|---|---:|---:|---:|---|")
+          for item in value["branches"]:
+              if item["ahead"]:
+                  print(f"| `{item['name']}` | {item['status']} | {item['ahead']} | {item['age_days']}d | {item['pr']['url'] or 'missing'} |")
+          PY

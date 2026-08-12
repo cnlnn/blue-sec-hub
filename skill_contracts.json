@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "levels": [
+    "content",
+    "platform-content",
+    "functional-data",
+    "executable",
+    "platform-runtime",
+    "core-runtime"
+  ],
+  "rules": [
+    {"pattern": "README.md", "level": "content"},
+    {"pattern": "LICENSE", "level": "content"},
+    {"pattern": "THIRD_PARTY_NOTICES.md", "level": "content"},
+    {"pattern": "docs/**", "level": "content"},
+    {"pattern": "benchmarks/README.md", "level": "content"},
+    {"pattern": "knowledge-packs/**", "level": "content"},
+    {"pattern": "evals/**", "level": "content"},
+    {"pattern": "skills/*/SKILL.md", "level": "content"},
+    {"pattern": "skills/*/references/*.md", "level": "content"},
+    {"pattern": "skills/*/agents/**", "level": "platform-content", "platforms": ["codex"]},
+    {"pattern": "skills/*/references/*.json", "level": "functional-data"},
+    {"pattern": "skills/*/templates/**", "level": "functional-data"},
+    {"pattern": "skills/*/scripts/**", "level": "executable"},
+    {"pattern": "platform-packages/gemini/**", "level": "platform-runtime", "platforms": ["gemini"]},
+    {"pattern": "platform-packages/grok/**", "level": "platform-runtime", "platforms": ["grok"]},
+    {"pattern": "platform-packages/openclaw/**", "level": "platform-runtime", "platforms": ["openclaw"]},
+    {"pattern": "platform-packages/hermes/**", "level": "platform-runtime", "platforms": ["hermes"]},
+    {"pattern": "scripts/*.py", "level": "executable"},
+    {"pattern": "scripts/agent.py", "level": "core-runtime"},
+    {"pattern": "scripts/context_*.py", "level": "core-runtime"},
+    {"pattern": "scripts/doctor.py", "level": "core-runtime"},
+    {"pattern": "scripts/effective_skills.py", "level": "core-runtime"},
+    {"pattern": "scripts/install.py", "level": "core-runtime"},
+    {"pattern": "scripts/learning*.py", "level": "core-runtime"},
+    {"pattern": "scripts/platforms.py", "level": "core-runtime"},
+    {"pattern": "scripts/update.py", "level": "core-runtime"},
+    {"pattern": "platforms.json", "level": "core-runtime"},
+    {"pattern": "pyproject.toml", "level": "core-runtime"},
+    {"pattern": "uv.lock", "level": "core-runtime"},
+    {"pattern": ".github/workflows/**", "level": "core-runtime"}
+  ]
+}

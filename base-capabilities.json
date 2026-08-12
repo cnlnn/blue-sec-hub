@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "capabilities": [
+    {
+      "id": "web-resumable-risk-plan",
+      "skill": "blue-web-patrol",
+      "match_terms": ["resumable", "risk-prioritized", "test plans"],
+      "anchors": [
+        {"path": "skills/blue-web-patrol/SKILL.md", "contains": "八个可恢复阶段"},
+        {"path": "skills/blue-web-patrol/references/comprehensive-assessment.md", "contains": "P0"}
+      ]
+    },
+    {
+      "id": "authorization-mode-decomposition",
+      "skill": "blue-web-patrol",
+      "match_terms": ["single-account", "cross-principal ownership", "mode-specific evidence"],
+      "anchors": [
+        {"path": "skills/blue-web-patrol/SKILL.md", "contains": "cross-principal-ownership"},
+        {"path": "scripts/web_assessment.py", "contains": "authorization-capability"}
+      ]
+    },
+    {
+      "id": "spa-route-execution-closure",
+      "skill": "blue-web-patrol",
+      "match_terms": ["historical route inventory", "route navigation", "runtime api linking"],
+      "anchors": [
+        {"path": "skills/blue-web-patrol/SKILL.md", "contains": "当前路由完成当前验证、导航、渲染、控件提取、运行时 API 关联"}
+      ]
+    },
+    {
+      "id": "deterministic-web-runner",
+      "skill": "blue-web-patrol",
+      "match_terms": ["deterministic execution gate", "blue-sec-web-runner", "per-variant ledger"],
+      "anchors": [
+        {"path": "skills/blue-web-patrol/SKILL.md", "contains": "blue-sec-web-runner"},
+        {"path": "scripts/web_runner.py", "contains": "runner-checkpoint"}
+      ]
+    },
+    {
+      "id": "pre-auth-state-binding",
+      "skill": "blue-web-patrol",
+      "match_terms": ["pre-authentication", "producer-consumer", "one-time-use bindings"],
+      "anchors": [
+        {"path": "skills/blue-web-patrol/SKILL.md", "contains": "一次性绑定"},
+        {"path": "skills/blue-web-patrol/references/prerequisite-registry.json", "contains": "challenge-ticket"}
+      ]
+    },
+    {
+      "id": "durable-context-continuity",
+      "skill": "blue-team-security",
+      "match_terms": ["context continuity", "context capsules", "hashed canonical"],
+      "anchors": [
+        {"path": "skills/blue-team-security/SKILL.md", "contains": "context-capsule.json"},
+        {"path": "skills/blue-team-security/references/context-continuity.md", "contains": "canonical source"}
+      ]
+    },
+    {
+      "id": "spa-nested-route-composition",
+      "skill": "spa-security-object-graph",
+      "match_terms": ["relative child routes", "dynamic-menu", "unparsed http 200"],
+      "anchors": [
+        {"path": "skills/spa-security-object-graph/SKILL.md", "contains": "功能点、路由和 API 分开采集"},
+        {"path": "skills/spa-security-object-graph/SKILL.md", "contains": "解析失败"}
+      ]
+    },
+    {
+      "id": "compound-candidate-prerequisites",
+      "skill": "blue-web-patrol",
+      "match_terms": ["compound-vulnerability prerequisites", "machine-readable dependencies", "deferred candidates"],
+      "anchors": [
+        {"path": "skills/blue-web-patrol/SKILL.md", "contains": "validation_dependencies"},
+        {"path": "skills/blue-web-patrol/references/web-assessment-events.md", "contains": "candidate-dependency"}
+      ]
+    },
+    {
+      "id": "universal-prerequisite-closure",
+      "skill": "blue-web-patrol",
+      "match_terms": ["全部 56 个 test family", "waiting-prerequisite", "sibling-path audit"],
+      "anchors": [
+        {"path": "skills/blue-web-patrol/SKILL.md", "contains": "Universal Prerequisite Closure"},
+        {"path": "scripts/web_assessment.py", "contains": "prerequisite registry must explicitly cover every test family"}
+      ]
+    }
+  ]
+}

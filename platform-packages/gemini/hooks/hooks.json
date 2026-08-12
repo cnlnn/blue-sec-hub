@@ -1,0 +1,13 @@
+{
+  "hooks": {
+    "PreCompress": [
+      {"matcher": "*", "hooks": [{"type": "command", "command": "blue-sec-context-hook --platform gemini --event PreCompress"}]}
+    ],
+    "SessionStart": [
+      {"matcher": "*", "hooks": [{"type": "command", "command": "blue-sec-context-hook --platform gemini --event SessionStart"}]}
+    ],
+    "SessionEnd": [
+      {"matcher": "*", "hooks": [{"type": "command", "command": "blue-sec-context-hook --platform gemini --event SessionEnd"}]}
+    ]
+  }
+}

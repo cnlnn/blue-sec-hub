@@ -1,0 +1,17 @@
+{
+  "description": "Blue Sec Hub durable security-task context lifecycle",
+  "hooks": {
+    "PreCompact": [
+      {"matcher": "*", "hooks": [{"type": "command", "command": "blue-sec-context-hook --platform auto --event PreCompact"}]}
+    ],
+    "PostCompact": [
+      {"matcher": "*", "hooks": [{"type": "command", "command": "blue-sec-context-hook --platform auto --event PostCompact"}]}
+    ],
+    "SessionStart": [
+      {"matcher": "startup|resume|compact", "hooks": [{"type": "command", "command": "blue-sec-context-hook --platform auto --event SessionStart"}]}
+    ],
+    "SessionEnd": [
+      {"matcher": "*", "hooks": [{"type": "command", "command": "blue-sec-context-hook --platform auto --event SessionEnd"}]}
+    ]
+  }
+}

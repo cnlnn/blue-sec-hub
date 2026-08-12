@@ -1,0 +1,11 @@
+{
+  "name": "blue-sec-hub",
+  "version": "0.8.0",
+  "description": "Enterprise blue-team skills with durable security-task context",
+  "mcpServers": {
+    "blue-sec-hub": {
+      "command": "blue-sec-agent",
+      "args": ["serve", "--stdio"]
+    }
+  }
+}

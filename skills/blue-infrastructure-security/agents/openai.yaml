@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blue Infrastructure Security"
+  short_description: "Validate host, middleware, database and device vulnerabilities"
+  default_prompt: "Use $blue-infrastructure-security to assess this authorized infrastructure evidence, validate scanner claims, and separate patch, configuration and exposure findings."

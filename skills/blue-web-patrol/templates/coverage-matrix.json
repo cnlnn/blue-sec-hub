@@ -1,0 +1,250 @@
+{
+  "schema_version": 8,
+  "assessment_id": null,
+  "target": null,
+  "mode": "comprehensive-fast-first",
+  "assessment_state": "interim",
+  "created_at": null,
+  "updated_at": null,
+  "scope": {
+    "mode": "related-discovery",
+    "target_origin": null,
+    "active_origins": [],
+    "same_site_runtime_policy": "safe-read",
+    "same_site_passive_policy": "passive-only",
+    "cross_site_policy": "passive-only",
+    "unknown_third_party_policy": "scope-confirmation-required"
+  },
+  "standards": [],
+  "input_sources": [],
+  "history": {
+    "lookup_state": "not-started",
+    "target_keys": [],
+    "matches": [],
+    "evidence_refs": []
+  },
+  "runtime": {
+    "credential_state": "unknown",
+    "credential_reason": null,
+    "conditions": [],
+    "rate_limit_policy": "bounded-adaptive",
+    "resume_policy": "event-log",
+    "runner_required": false,
+    "runner_state": "not-started",
+    "credential_lease": {},
+    "execution_audit": {},
+    "agent_state": "not-started",
+    "agent_roles": {"recon": "not-started", "tester": "not-started", "auditor": "not-started"}
+  },
+  "discovery_rounds": [],
+  "protocol_profiles": [],
+  "knowledge_seeds": {
+    "formal_patterns": 0,
+    "local_hypotheses": 0,
+    "actionable_local_hypotheses": 0,
+    "target_history": 0,
+    "last_refresh_state": "not-started"
+  },
+  "execution_lanes": {
+    "fast-find": {"queued": 0, "resolved": 0, "first_finding_at": null},
+    "coverage-close": {"queued": 0, "resolved": 0}
+  },
+  "phases": [
+    {"id": "scope-safety", "status": "not-started", "evidence_refs": [], "gaps": []},
+    {"id": "history-cold-start", "status": "not-started", "evidence_refs": [], "gaps": []},
+    {"id": "related-passive-discovery", "status": "not-started", "evidence_refs": [], "gaps": []},
+    {"id": "surface-normalization", "status": "not-started", "evidence_refs": [], "gaps": []},
+    {"id": "work-unit-clustering", "status": "not-started", "evidence_refs": [], "gaps": []},
+    {"id": "test-plan-compilation", "status": "not-started", "evidence_refs": [], "gaps": []},
+    {"id": "risk-execution", "status": "not-started", "evidence_refs": [], "gaps": []},
+    {"id": "adjacent-replan", "status": "not-started", "evidence_refs": [], "gaps": []}
+  ],
+  "dimensions": {
+    "identities": [
+      {"id": "anonymous", "status": "available", "evidence_refs": []}
+    ],
+    "roles": [],
+    "tenants": [],
+    "business_states": [],
+    "object_ownership": [],
+    "authorization_capabilities": []
+  },
+  "inventory_summary": {},
+  "route_coverage": {
+    "discovered": 0,
+    "current_validated": 0,
+    "navigated": 0,
+    "rendered": 0,
+    "controls_extracted": 0,
+    "runtime_api_linked": 0,
+    "tests_resolved": 0,
+    "waiting_prerequisite": 0,
+    "blocked": 0,
+    "unresolved": 0
+  },
+  "surface_execution_summary": {},
+  "execution_coverage": {
+    "auto_cases": 0,
+    "auto_resolved": 0,
+    "variants": 0,
+    "variants_resolved": 0,
+    "needs_agent": 0,
+    "candidate_prerequisite_gaps": 0,
+    "test_prerequisite_gaps": 0,
+    "audit_passed": false
+  },
+  "queue_summary": {},
+  "coverage": [
+    {
+      "id": "identity-session",
+      "status": "not-started",
+      "gaps": [],
+      "families": [
+        {"id": "identity-session.identity-lifecycle", "status": "not-started", "standard_refs": ["WSTG-v4.2-IDNT", "ASVS-v5.0.0-V2"], "test_cell_refs": [], "gaps": []},
+        {"id": "identity-session.authentication", "status": "not-started", "standard_refs": ["WSTG-v4.2-ATHN", "ASVS-v5.0.0-V6"], "test_cell_refs": [], "gaps": []},
+        {"id": "identity-session.response-differential", "status": "not-started", "standard_refs": ["WSTG-v4.2-IDNT-04", "API4:2023"], "test_cell_refs": [], "gaps": []},
+        {"id": "identity-session.message-delivery-abuse", "status": "not-started", "standard_refs": ["WSTG-v4.2-ATHN", "API4:2023"], "test_cell_refs": [], "gaps": []},
+        {"id": "identity-session.recovery-mfa", "status": "not-started", "standard_refs": ["WSTG-v4.2-ATHN-09", "ASVS-v5.0.0-V6"], "test_cell_refs": [], "gaps": []},
+        {"id": "identity-session.session-token", "status": "not-started", "standard_refs": ["WSTG-v4.2-SESS", "ASVS-v5.0.0-V7"], "test_cell_refs": [], "gaps": []},
+        {"id": "identity-session.token-claim-minimization", "status": "not-started", "standard_refs": ["WSTG-v4.2-SESS", "ASVS-v5.0.0-V7"], "test_cell_refs": [], "gaps": []},
+        {"id": "identity-session.oauth-sso", "status": "not-started", "standard_refs": ["WSTG-v4.2-ATHZ-05", "ASVS-v5.0.0-V9"], "test_cell_refs": [], "gaps": []},
+        {"id": "identity-session.cross-origin-csrf", "status": "not-started", "standard_refs": ["WSTG-v4.2-SESS-05", "API8:2023"], "test_cell_refs": [], "gaps": []}
+      ]
+    },
+    {
+      "id": "authorization",
+      "status": "not-started",
+      "gaps": [],
+      "families": [
+        {"id": "authorization.object-level", "status": "not-started", "standard_refs": ["WSTG-v4.2-ATHZ-04", "API1:2023"], "test_cell_refs": [], "gaps": []},
+        {"id": "authorization.identifier-provenance", "status": "not-started", "standard_refs": ["WSTG-v4.2-ATHZ-04", "API1:2023"], "test_cell_refs": [], "gaps": []},
+        {"id": "authorization.cross-protocol-parity", "status": "not-started", "standard_refs": ["WSTG-v4.2-ATHZ", "API5:2023"], "test_cell_refs": [], "gaps": []},
+        {"id": "authorization.function-level", "status": "not-started", "standard_refs": ["WSTG-v4.2-ATHZ-02", "API5:2023"], "test_cell_refs": [], "gaps": []},
+        {"id": "authorization.property-level", "status": "not-started", "standard_refs": ["ASVS-v5.0.0-V8", "API3:2023"], "test_cell_refs": [], "gaps": []},
+        {"id": "authorization.tenant-parent-state", "status": "not-started", "standard_refs": ["ASVS-v5.0.0-V8"], "test_cell_refs": [], "gaps": []},
+        {"id": "authorization.workflow-state", "status": "not-started", "standard_refs": ["WSTG-v4.2-BUSL-06"], "test_cell_refs": [], "gaps": []},
+        {"id": "authorization.file-export", "status": "not-started", "standard_refs": ["WSTG-v4.2-ATHZ", "ASVS-v5.0.0-V8"], "test_cell_refs": [], "gaps": []}
+      ]
+    },
+    {
+      "id": "injection",
+      "status": "not-started",
+      "gaps": [],
+      "families": [
+        {"id": "injection.sql-nosql-orm", "status": "not-started", "standard_refs": ["WSTG-v4.2-INPV-05", "ASVS-v5.0.0-V1"], "test_cell_refs": [], "gaps": []},
+        {"id": "injection.command-code-template", "status": "not-started", "standard_refs": ["WSTG-v4.2-INPV-11", "WSTG-v4.2-INPV-18"], "test_cell_refs": [], "gaps": []},
+        {"id": "injection.xml-ldap-xpath", "status": "not-started", "standard_refs": ["WSTG-v4.2-INPV-06", "WSTG-v4.2-INPV-09"], "test_cell_refs": [], "gaps": []},
+        {"id": "injection.request-header-log", "status": "not-started", "standard_refs": ["WSTG-v4.2-INPV-15", "WSTG-v4.2-INPV-17"], "test_cell_refs": [], "gaps": []},
+        {"id": "injection.prototype-mass-assignment", "status": "not-started", "standard_refs": ["WSTG-v4.2-INPV-20", "WSTG-v4.2-INPV-22"], "test_cell_refs": [], "gaps": []}
+      ]
+    },
+    {
+      "id": "browser-content",
+      "status": "not-started",
+      "gaps": [],
+      "families": [
+        {"id": "browser-content.xss-dom-richtext", "status": "not-started", "standard_refs": ["WSTG-v4.2-INPV-01", "WSTG-v4.2-CLNT-01"], "test_cell_refs": [], "gaps": []},
+        {"id": "browser-content.redirect-scheme", "status": "not-started", "standard_refs": ["WSTG-v4.2-CLNT-04"], "test_cell_refs": [], "gaps": []},
+        {"id": "browser-content.postmessage-framing", "status": "not-started", "standard_refs": ["WSTG-v4.2-CLNT", "ASVS-v5.0.0-V3"], "test_cell_refs": [], "gaps": []},
+        {"id": "browser-content.storage-cache", "status": "not-started", "standard_refs": ["WSTG-v4.2-ATHN-06", "WSTG-v4.2-SESS-04"], "test_cell_refs": [], "gaps": []}
+      ]
+    },
+    {
+      "id": "server-side-processing",
+      "status": "not-started",
+      "gaps": [],
+      "families": [
+        {"id": "server-side-processing.ssrf-webhook-proxy", "status": "not-started", "standard_refs": ["WSTG-v4.2-INPV-19"], "test_cell_refs": [], "gaps": []},
+        {"id": "server-side-processing.xxe-parser", "status": "not-started", "standard_refs": ["WSTG-v4.2-INPV-07"], "test_cell_refs": [], "gaps": []},
+        {"id": "server-side-processing.deserialization-template", "status": "not-started", "standard_refs": ["ASVS-v5.0.0-V1", "A08:2025"], "test_cell_refs": [], "gaps": []},
+        {"id": "server-side-processing.converter-background-job", "status": "not-started", "standard_refs": ["ASVS-v5.0.0-V13"], "test_cell_refs": [], "gaps": []},
+        {"id": "server-side-processing.unsafe-api-consumption", "status": "not-started", "standard_refs": ["API10:2023"], "test_cell_refs": [], "gaps": []}
+      ]
+    },
+    {
+      "id": "files-data-export",
+      "status": "not-started",
+      "gaps": [],
+      "families": [
+        {"id": "files-data-export.upload-validation", "status": "not-started", "standard_refs": ["WSTG-v4.2-BUSL-08", "WSTG-v4.2-BUSL-09"], "test_cell_refs": [], "gaps": []},
+        {"id": "files-data-export.path-read-download", "status": "not-started", "standard_refs": ["WSTG-v4.2-ATHZ-01"], "test_cell_refs": [], "gaps": []},
+        {"id": "files-data-export.archive-extraction", "status": "not-started", "standard_refs": ["ASVS-v5.0.0-V5"], "test_cell_refs": [], "gaps": []},
+        {"id": "files-data-export.storage-exposure", "status": "not-started", "standard_refs": ["WSTG-v4.2-CONF-11"], "test_cell_refs": [], "gaps": []},
+        {"id": "files-data-export.import-export-formula", "status": "not-started", "standard_refs": ["WSTG-v4.2-INPV-21"], "test_cell_refs": [], "gaps": []}
+      ]
+    },
+    {
+      "id": "api-protocol-variants",
+      "status": "not-started",
+      "gaps": [],
+      "families": [
+        {"id": "api-protocol.method-content-type", "status": "not-started", "standard_refs": ["WSTG-v4.2-CONF-06", "WSTG-v4.2-INPV-03"], "test_cell_refs": [], "gaps": []},
+        {"id": "api-protocol.parameter-encoding", "status": "not-started", "standard_refs": ["WSTG-v4.2-INPV-04"], "test_cell_refs": [], "gaps": []},
+        {"id": "api-protocol.edge-backend-normalization", "status": "not-started", "standard_refs": ["WSTG-v4.2-CONF-06", "API8:2023"], "test_cell_refs": [], "gaps": []},
+        {"id": "api-protocol.version-batch-shadow", "status": "not-started", "standard_refs": ["API9:2023"], "test_cell_refs": [], "gaps": []},
+        {"id": "api-protocol.graphql", "status": "not-started", "standard_refs": ["API4:2023"], "test_cell_refs": [], "gaps": []},
+        {"id": "api-protocol.websocket-sse-soap", "status": "not-started", "standard_refs": ["ASVS-v5.0.0-V4"], "test_cell_refs": [], "gaps": []},
+        {"id": "api-protocol.documentation-shadow", "status": "not-started", "standard_refs": ["WSTG-v4.2-INFO-06", "API9:2023"], "test_cell_refs": [], "gaps": []}
+      ]
+    },
+    {
+      "id": "business-logic",
+      "status": "not-started",
+      "gaps": [],
+      "families": [
+        {"id": "business-logic.lifecycle-integrity", "status": "not-started", "standard_refs": ["WSTG-v4.2-BUSL-01", "WSTG-v4.2-BUSL-06"], "test_cell_refs": [], "gaps": []},
+        {"id": "business-logic.replay-idempotency", "status": "not-started", "standard_refs": ["WSTG-v4.2-BUSL-02", "WSTG-v4.2-BUSL-05"], "test_cell_refs": [], "gaps": []},
+        {"id": "business-logic.race-concurrency", "status": "not-started", "standard_refs": ["WSTG-v4.2-BUSL-04"], "test_cell_refs": [], "gaps": []},
+        {"id": "business-logic.quota-resource-abuse", "status": "not-started", "standard_refs": ["API4:2023", "API6:2023"], "test_cell_refs": [], "gaps": []},
+        {"id": "business-logic.approval-invite-share", "status": "not-started", "standard_refs": ["WSTG-v4.2-BUSL"], "test_cell_refs": [], "gaps": []},
+        {"id": "business-logic.cross-function-chain", "status": "not-started", "standard_refs": ["A06:2025", "API6:2023"], "test_cell_refs": [], "gaps": []}
+      ]
+    },
+    {
+      "id": "platform-exposure",
+      "status": "not-started",
+      "gaps": [],
+      "families": [
+        {"id": "platform-exposure.tls-cryptography", "status": "not-started", "standard_refs": ["WSTG-v4.2-CRYP-01", "A04:2025"], "test_cell_refs": [], "gaps": []},
+        {"id": "platform-exposure.headers-cache-cors", "status": "not-started", "standard_refs": ["WSTG-v4.2-CONF-07", "WSTG-v4.2-CONF-14", "API8:2023"], "test_cell_refs": [], "gaps": []},
+        {"id": "platform-exposure.debug-admin-docs", "status": "not-started", "standard_refs": ["WSTG-v4.2-CONF-05", "A02:2025"], "test_cell_refs": [], "gaps": []},
+        {"id": "platform-exposure.client-bootstrap-config", "status": "not-started", "standard_refs": ["WSTG-v4.2-INFO-05", "ASVS-v5.0.0-V14"], "test_cell_refs": [], "gaps": []},
+        {"id": "platform-exposure.backup-default-cloud", "status": "not-started", "standard_refs": ["WSTG-v4.2-CONF-04", "WSTG-v4.2-CONF-11"], "test_cell_refs": [], "gaps": []},
+        {"id": "platform-exposure.dependencies-supply-chain", "status": "not-started", "standard_refs": ["A03:2025", "A08:2025"], "test_cell_refs": [], "gaps": []},
+        {"id": "platform-exposure.error-exception-logging", "status": "not-started", "standard_refs": ["WSTG-v4.2-ERRH", "A09:2025", "A10:2025"], "test_cell_refs": [], "gaps": []}
+      ]
+    }
+  ],
+  "candidates": [],
+  "findings": [],
+  "missed_findings": [],
+  "stop_gates": {
+    "surface_inventory_accounted": false,
+    "historical_baseline_checked": false,
+    "discovery_phases_resolved": false,
+    "work_units_compiled": false,
+    "applicable_families_resolved": false,
+    "test_queue_resolved": false,
+    "high_risk_candidates_resolved": false,
+    "candidate_prerequisites_resolved": false,
+    "test_prerequisites_resolved": false,
+    "adjacent_surfaces_checked": false,
+    "evidence_indexed": false,
+    "cleanup_complete_or_documented": false,
+    "standards_snapshot_recorded": false,
+    "event_log_resolved": false,
+    "route_inventory_current_validated": false,
+    "route_navigation_and_render_complete": false,
+    "visible_controls_resolved": false,
+    "runtime_api_links_accounted": false,
+    "route_tests_resolved": false,
+    "discovery_queue_exhausted": false,
+    "auto_safe_queue_exhausted": false,
+    "variant_matrix_resolved": false,
+    "agent_review_queue_resolved": false,
+    "agent_roles_resolved": false,
+    "discovery_saturation_confirmed": false,
+    "credential_requirements_accounted": false,
+    "independent_execution_audit_passed": false
+  }
+}

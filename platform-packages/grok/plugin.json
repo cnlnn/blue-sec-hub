@@ -1,0 +1,8 @@
+{
+  "name": "blue-sec-hub",
+  "version": "0.8.0",
+  "description": "Enterprise blue-team skills, MCP tools and context lifecycle hooks",
+  "skills": "../../skills",
+  "hooks": "../../hooks/hooks.json",
+  "mcpServers": "../../.mcp.json"
+}

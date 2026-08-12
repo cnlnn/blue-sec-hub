@@ -1,0 +1,52 @@
+{
+  "hack-skills": {
+    "url": "https://github.com/yaklang/hack-skills.git",
+    "path": "skills",
+    "trust": "community",
+    "license_required": true
+  },
+  "strix": {
+    "url": "https://github.com/usestrix/strix.git",
+    "path": "strix/skills",
+    "trust": "community",
+    "license_required": true
+  },
+  "transilience": {
+    "url": "https://github.com/transilienceai/communitytools.git",
+    "paths": [
+      "skills/ai-threat-testing",
+      "skills/attack-path-stitcher",
+      "skills/cloud-defense",
+      "skills/cve-poc-generator",
+      "skills/dfir",
+      "skills/firewall-review",
+      "skills/mobile-security",
+      "skills/pentest-engagement",
+      "skills/reconnaissance",
+      "skills/regression-sweep",
+      "skills/risk-prioritiser",
+      "skills/source-code-scanning",
+      "skills/techstack-identification",
+      "skills/ti-ingest"
+    ],
+    "trust": "community",
+    "license_required": true
+  },
+  "claude-bug-bounty": {
+    "url": "https://github.com/shuvonsec/claude-bug-bounty.git",
+    "paths": [
+      "skills/triage-validation",
+      "skills/report-writing",
+      "memory",
+      "mcp"
+    ],
+    "trust": "community",
+    "license_required": true
+  },
+  "payloads-all-the-things": {
+    "url": "https://github.com/swisskyrepo/PayloadsAllTheThings.git",
+    "kind": "payload-corpus",
+    "trust": "community",
+    "license_required": true
+  }
+}

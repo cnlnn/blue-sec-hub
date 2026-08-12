@@ -1,0 +1,4 @@
+interface:
+  display_name: "蓝队安全知识库"
+  short_description: "按需检索HackSkills、Strix和DFIR知识"
+  default_prompt: "$blue-security-knowledge 为当前蓝队任务检索最相关的专项方法。"

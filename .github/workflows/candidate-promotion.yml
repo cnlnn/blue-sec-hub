@@ -1,0 +1,158 @@
+name: Candidate Promotion
+
+on:
+  push:
+    tags:
+      - "blue-sec-candidate/**"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: candidate-promotion
+  cancel-in-progress: false
+
+env:
+  PYTHONUTF8: "1"
+  UV_NO_PROGRESS: "1"
+
+jobs:
+  impact:
+    runs-on: ubuntu-24.04
+    outputs:
+      unit: ${{ steps.classify.outputs.unit }}
+      os_matrix: ${{ steps.classify.outputs.os_matrix }}
+      platform_matrix: ${{ steps.classify.outputs.platform_matrix }}
+      platforms: ${{ steps.classify.outputs.platforms }}
+    steps:
+      - name: Check out candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+      - name: Classify candidate
+        id: classify
+        shell: bash
+        run: |
+          result=$(python scripts/change_impact.py --base HEAD^ --json)
+          python - "$result" >> "$GITHUB_OUTPUT" <<'PY'
+          import json
+          import sys
+          value = json.loads(sys.argv[1])
+          print(f"unit={str(value['gates']['unit']).lower()}")
+          print(f"os_matrix={str(value['gates']['os_matrix']).lower()}")
+          print(f"platform_matrix={str(value['gates']['platform_matrix']).lower()}")
+          print("platforms=" + json.dumps(value["platforms"], separators=(",", ":")))
+          PY
+
+  content:
+    needs: impact
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Validate content candidate
+        run: python scripts/validate_content.py
+
+  validate:
+    if: needs.impact.outputs.os_matrix == 'true'
+    needs: impact
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-2025]
+    env:
+      BLUE_SEC_CACHE: ${{ github.workspace }}/.ci-state/cache
+      BLUE_SEC_CONFIG: ${{ github.workspace }}/.ci-state/config
+      BLUE_SEC_DATA: ${{ github.workspace }}/.ci-state/data
+    steps:
+      - name: Check out candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Run functional validation
+        run: python scripts/validate.py --offline
+
+  unit-linux:
+    if: needs.impact.outputs.unit == 'true' && needs.impact.outputs.os_matrix != 'true'
+    needs: impact
+    runs-on: ubuntu-24.04
+    env:
+      BLUE_SEC_CACHE: ${{ github.workspace }}/.ci-state/cache
+      BLUE_SEC_CONFIG: ${{ github.workspace }}/.ci-state/config
+      BLUE_SEC_DATA: ${{ github.workspace }}/.ci-state/data
+    steps:
+      - name: Check out candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Run functional data tests
+        run: python scripts/validate.py --offline
+
+  platform-contract:
+    if: needs.impact.outputs.platform_matrix == 'true'
+    needs: impact
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ${{ fromJSON(needs.impact.outputs.platforms) }}
+    env:
+      BLUE_SEC_BIN: ${{ github.workspace }}/.platform-state/bin
+      BLUE_SEC_DATA: ${{ github.workspace }}/.platform-state/data
+      BLUE_SEC_CONFIG: ${{ github.workspace }}/.platform-state/config
+    steps:
+      - name: Check out candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.11"
+      - name: Validate affected platform
+        shell: bash
+        env:
+          HOME: ${{ github.workspace }}/.platform-state/home
+        run: |
+          python scripts/install.py --platform "${{ matrix.platform }}"
+          python scripts/doctor.py --platform "${{ matrix.platform }}" --json
+          python scripts/install.py --platform "${{ matrix.platform }}" --uninstall
+
+  promote:
+    if: >-
+      always() &&
+      needs.content.result == 'success' &&
+      (needs.unit-linux.result == 'success' || needs.unit-linux.result == 'skipped') &&
+      (needs.validate.result == 'success' || needs.validate.result == 'skipped') &&
+      (needs.platform-contract.result == 'success' || needs.platform-contract.result == 'skipped')
+    needs: [impact, content, unit-linux, validate, platform-contract]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+      - name: Fast-forward main and delete candidate tag
+        shell: bash
+        run: |
+          git fetch origin main
+          test "$(git rev-parse HEAD^)" = "$(git rev-parse origin/main)"
+          git push origin HEAD:refs/heads/main
+          git push origin ":refs/tags/${GITHUB_REF_NAME}"
+
+  cleanup-failed-tag:
+    if: always() && needs.promote.result != 'success'
+    needs: [impact, content, unit-linux, validate, platform-contract, promote]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Delete failed candidate tag
+        run: git push origin ":refs/tags/${GITHUB_REF_NAME}"

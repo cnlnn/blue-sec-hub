@@ -1,0 +1,66 @@
+{
+  "portswigger-web-security-academy": {
+    "type": "live",
+    "url": "https://portswigger.net/web-security"
+  },
+  "cisa-kev": {
+    "type": "http",
+    "url": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+    "target": "cisa-kev/known_exploited_vulnerabilities.json"
+  },
+  "mitre-cwe": {
+    "type": "http",
+    "url": "https://cwe.mitre.org/data/xml/cwec_latest.xml.zip",
+    "target": "mitre-cwe/cwec_latest.xml.zip",
+    "max_bytes": 26214400
+  },
+  "owasp-wstg": {
+    "type": "git-sparse",
+    "url": "https://github.com/OWASP/wstg.git",
+    "paths": ["checklists", "document"]
+  },
+  "owasp-asvs": {
+    "type": "git-sparse",
+    "url": "https://github.com/OWASP/ASVS.git",
+    "paths": ["5.0"]
+  },
+  "owasp-api-security": {
+    "type": "git-sparse",
+    "url": "https://github.com/OWASP/API-Security.git",
+    "paths": ["editions/2023"]
+  },
+  "owasp-top-10": {
+    "type": "git-sparse",
+    "url": "https://github.com/OWASP/Top10.git",
+    "paths": ["2025"]
+  },
+  "owasp-mastg": {
+    "type": "git-sparse",
+    "url": "https://github.com/OWASP/mastg.git",
+    "paths": ["best-practices", "knowledge", "techniques", "tests", "tools"]
+  },
+  "mitre-attack": {
+    "type": "git-sparse",
+    "url": "https://github.com/mitre-attack/attack-stix-data.git",
+    "cone": false,
+    "paths": [
+      "README.md",
+      "USAGE.md",
+      "LICENSE.txt",
+      "enterprise-attack/enterprise-attack.json",
+      "ics-attack/ics-attack.json",
+      "mobile-attack/mobile-attack.json"
+    ]
+  },
+  "sigma": {
+    "type": "git-sparse",
+    "url": "https://github.com/SigmaHQ/sigma.git",
+    "paths": [
+      "documentation",
+      "rules",
+      "rules-dfir",
+      "rules-emerging-threats",
+      "rules-threat-hunting"
+    ]
+  }
+}

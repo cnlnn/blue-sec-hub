@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "source": "PayloadsAllTheThings",
+  "source_kind": "payload-corpus",
+  "default_policy": "needs-agent",
+  "families": {
+    "authorization.object-level": {
+      "technique_refs": ["patt:insecure-direct-object-references"],
+      "payload_policy": "safe-auto",
+      "payload_template_ref": "authorization-object-selector-variants",
+      "binding_requirements": ["runtime-request-shape", "current-or-self-owned-object", "single-variable-variant"],
+      "oracle_id": "authorization-boundary-differential"
+    },
+    "authorization.function-level": {
+      "technique_refs": ["patt:methodology-forced-browsing"],
+      "payload_policy": "safe-auto",
+      "payload_template_ref": "authorization-function-replay",
+      "binding_requirements": ["runtime-request-shape", "anonymous-or-low-privilege-baseline"],
+      "oracle_id": "authorization-function-impact"
+    },
+    "authorization.property-level": {
+      "technique_refs": ["patt:mass-assignment"],
+      "payload_policy": "needs-agent",
+      "payload_template_ref": "protected-property-transaction",
+      "binding_requirements": ["self-owned-object", "verified-prestate", "rollback-template"],
+      "oracle_id": "protected-property-persistence"
+    },
+    "identity-session.cross-origin-csrf": {
+      "technique_refs": ["patt:cross-site-request-forgery"],
+      "payload_policy": "needs-agent",
+      "payload_template_ref": "csrf-browser-transaction",
+      "binding_requirements": ["browser-cookie-authentication", "self-owned-reversible-action"],
+      "oracle_id": "cross-origin-state-change"
+    },
+    "identity-session.response-differential": {
+      "technique_refs": ["patt:account-takeover", "patt:brute-force-rate-limit"],
+      "payload_policy": "needs-agent",
+      "payload_template_ref": "pre-authentication-state-provenance",
+      "binding_requirements": ["observed-producer-consumer-flow", "current-test-identity", "no-real-message-send"],
+      "oracle_id": "pre-authentication-state-binding"
+    },
+    "identity-session.oauth-sso": {
+      "technique_refs": ["patt:oauth", "patt:saml-injection"],
+      "payload_policy": "safe-auto",
+      "payload_template_ref": "builtin:oauth-metadata-review",
+      "binding_requirements": ["observed-authentication-flow", "callback-and-state-model"],
+      "oracle_id": "identity-flow-boundary"
+    },
+    "identity-session.session-token": {
+      "technique_refs": ["patt:json-web-token"],
+      "payload_policy": "safe-auto",
+      "payload_template_ref": "session-lifecycle-differential",
+      "binding_requirements": ["current-session-artifact", "no-credential-persistence"],
+      "oracle_id": "session-lifecycle-differential"
+    },
+    "injection.sql-nosql-orm": {
+      "technique_refs": ["patt:sql-injection", "patt:nosql-injection"],
+      "payload_policy": "safe-auto",
+      "payload_template_ref": "parser-boolean-differential",
+      "binding_requirements": ["runtime-read-only-shape", "scalar-input-field", "single-variable-variant"],
+      "oracle_id": "repeatable-parser-differential"
+    },
+    "injection.command-code-template": {
+      "technique_refs": ["patt:command-injection", "patt:server-side-template-injection"],
+      "payload_policy": "blocked",
+      "payload_template_ref": null,
+      "binding_requirements": ["controlled-lab-or-source-evidence"],
+      "oracle_id": "server-evaluation-capability"
+    },
+    "injection.xml-ldap-xpath": {
+      "technique_refs": ["patt:ldap-injection", "patt:xpath-injection", "patt:xslt-injection"],
+      "payload_policy": "safe-auto",
+      "payload_template_ref": "parser-syntax-differential",
+      "binding_requirements": ["runtime-read-only-shape", "parser-applicability-signal"],
+      "oracle_id": "repeatable-parser-differential"
+    },
+    "browser-content.xss-dom-richtext": {
+      "technique_refs": ["patt:xss-injection"],
+      "payload_policy": "safe-auto",
+      "payload_template_ref": "no-network-browser-marker",
+      "binding_requirements": ["reachable-render-path", "no-network-marker", "self-owned-draft-for-persistence"],
+      "oracle_id": "browser-render-context"
+    },
+    "server-side-processing.ssrf-webhook-proxy": {
+      "technique_refs": ["patt:server-side-request-forgery"],
+      "payload_policy": "needs-agent",
+      "payload_template_ref": null,
+      "binding_requirements": ["controlled-callback", "no-internal-network-access", "no-third-party-target"],
+      "oracle_id": "controlled-server-fetch"
+    },
+    "server-side-processing.xxe-parser": {
+      "technique_refs": ["patt:xxe-injection"],
+      "payload_policy": "needs-agent",
+      "payload_template_ref": null,
+      "binding_requirements": ["xml-parser-evidence", "no-file-read", "controlled-callback-if-used"],
+      "oracle_id": "xml-external-resolution"
+    },
+    "server-side-processing.deserialization-template": {
+      "technique_refs": ["patt:insecure-deserialization"],
+      "payload_policy": "blocked",
+      "payload_template_ref": null,
+      "binding_requirements": ["controlled-lab-or-source-evidence"],
+      "oracle_id": "deserialization-capability"
+    },
+    "files-data-export.upload-validation": {
+      "technique_refs": ["patt:upload-insecure-files"],
+      "payload_policy": "needs-agent",
+      "payload_template_ref": "inert-file-transaction",
+      "binding_requirements": ["small-inert-file", "self-owned-object", "cleanup-action"],
+      "oracle_id": "file-consumer-boundary"
+    },
+    "files-data-export.path-read-download": {
+      "technique_refs": ["patt:directory-traversal", "patt:file-inclusion"],
+      "payload_policy": "safe-auto",
+      "payload_template_ref": "self-owned-path-differential",
+      "binding_requirements": ["runtime-read-shape", "self-owned-path", "no-system-file-read"],
+      "oracle_id": "path-boundary-differential"
+    },
+    "api-protocol.edge-backend-normalization": {
+      "technique_refs": ["patt:http-request-smuggling", "patt:http-parameter-pollution"],
+      "payload_policy": "safe-auto",
+      "payload_template_ref": "single-path-normalization-variant",
+      "binding_requirements": ["existing-read-request", "single-normalization-variable", "same-handler-proof"],
+      "oracle_id": "edge-backend-handler-equivalence"
+    },
+    "api-protocol.graphql": {
+      "technique_refs": ["patt:graphql-injection"],
+      "payload_policy": "safe-auto",
+      "payload_template_ref": "builtin:graphql-typename",
+      "binding_requirements": ["observed-graphql-endpoint", "schema-or-runtime-query-shape"],
+      "oracle_id": "graphql-authorization-and-cost"
+    },
+    "api-protocol.websocket-sse-soap": {
+      "technique_refs": ["patt:web-sockets", "patt:soap"],
+      "payload_policy": "needs-agent",
+      "payload_template_ref": null,
+      "binding_requirements": ["observed-protocol-handshake", "current-session-context"],
+      "oracle_id": "protocol-control-parity"
+    },
+    "business-logic.race-concurrency": {
+      "technique_refs": ["patt:race-condition"],
+      "payload_policy": "needs-agent",
+      "payload_template_ref": "bounded-self-owned-concurrency",
+      "binding_requirements": ["self-owned-reversible-object", "maximum-concurrency-three"],
+      "oracle_id": "business-invariant-violation"
+    },
+    "platform-exposure.headers-cache-cors": {
+      "technique_refs": ["patt:cache-poisoning", "patt:cors-misconfiguration", "patt:host-header-injection"],
+      "payload_policy": "safe-auto",
+      "payload_template_ref": "passive-header-and-cache-review",
+      "binding_requirements": ["runtime-response", "no-shared-cache-poisoning"],
+      "oracle_id": "header-policy-differential"
+    }
+  },
+  "blocked_effects": [
+    "credential-theft",
+    "data-exfiltration",
+    "destructive-change",
+    "denial-of-service",
+    "high-load",
+    "persistence",
+    "reverse-shell",
+    "unrelated-object-access",
+    "web-shell"
+  ]
+}

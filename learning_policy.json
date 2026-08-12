@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "policy_version": 1,
+  "scope": {
+    "local_skill_updates": "all",
+    "upstream_supplements": "all"
+  },
+  "requirements": {
+    "target_independent": true,
+    "explicit_applicability": true,
+    "validation_evidence": true,
+    "preserve_upstream": true
+  },
+  "generalization": {
+    "unit": "declared-skill-scope",
+    "cross_scenario_for_behavior_changes": true,
+    "target_specific_material_destination": "task-evidence-or-candidate-only"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "local_skills": "skills/*/SKILL.md",
+  "upstream_knowledge": "${BLUE_SEC_CACHE:-~/.cache/blue-sec-hub}/upstreams",
+  "authoritative_feeds": "${BLUE_SEC_CACHE:-~/.cache/blue-sec-hub}/feeds",
+  "local_overlays": "${BLUE_SEC_DATA:-~/.local/share/blue-sec-hub}/overlays",
+  "learning_records": "${BLUE_SEC_DATA:-~/.local/share/blue-sec-hub}/learning",
+  "effective_skills": "${BLUE_SEC_DATA:-~/.local/share/blue-sec-hub}/effective",
+  "learning_policy": "learning_policy.json",
+  "internal_evidence_index": "${BLUE_SEC_DATA:-~/.local/share/blue-sec-hub}/internal",
+  "report_ingestion": "${BLUE_SEC_DATA:-~/.local/share/blue-sec-hub}/report-ingestion",
+  "report_profiles": "report_profiles.json and ${BLUE_SEC_DATA:-~/.local/share/blue-sec-hub}/report-ingestion/profiles",
+  "spa_semantic_lexicons": "skills/spa-security-object-graph/references/semantic-lexicon.json and ${BLUE_SEC_DATA:-~/.local/share/blue-sec-hub}/spa-security-object-graph/lexicons",
+  "report_intelligence": "${BLUE_SEC_DATA:-~/.local/share/blue-sec-hub}/report-intelligence",
+  "user_config": "${BLUE_SEC_CONFIG:-~/.config/blue-sec-hub}/config.json",
+  "security_terms": "security_terms.json",
+  "term_learning": "${BLUE_SEC_DATA:-~/.local/share/blue-sec-hub}/term-learning",
+  "python_dependencies": "pyproject.toml and uv.lock",
+  "rules": [
+    "Upstream synchronization may only replace upstream_knowledge.",
+    "Immediate learning promotion writes immutable local objects and never edits Git-tracked Skills.",
+    "Only periodic sanitized knowledge archives and functional candidates may update main.",
+    "Upstream learning must be promoted as a local overlay.",
+    "Bilingual terminology is local routing metadata and must not rewrite upstream files.",
+    "Only repository terms and official CWE terms may canonicalize report weakness classes.",
+    "Community-discovered terms are search hints until explicitly promoted.",
+    "Report ingestion artifacts are versioned local derivatives; original reports remain read-only.",
+    "Machine-extracted report findings remain drafts until evidence review.",
+    "The hub-wide learning policy applies to every local Skill update and every upstream supplement.",
+    "Skill learning may only promote target-independent rules reusable within the declared Skill scope.",
+    "Domain vocabulary may improve recall and ranking but must never gate structural graph generation."
+  ]
+}

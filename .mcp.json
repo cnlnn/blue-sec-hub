@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "blue-sec-hub": {
+      "type": "stdio",
+      "command": "blue-sec-agent",
+      "args": ["serve", "--stdio"]
+    }
+  }
+}

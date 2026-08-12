@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "executors": {
+    "blue-sec-native": {
+      "commands": ["blue-sec-agent"],
+      "adapter": "executor_native:NativeExecutorAdapter",
+      "role": "同站范围约束的浏览器、HTTP 和证据闭环执行",
+      "url": "https://github.com/cnlnn/blue-sec-hub"
+    },
+    "strix": {
+      "commands": ["strix"],
+      "adapter": "executor_strix:StrixAdapter",
+      "role": "自主应用安全测试与 PoC 验证",
+      "url": "https://github.com/usestrix/strix"
+    },
+    "shannon": {
+      "commands": ["shannon"],
+      "adapter": "executor_shannon:ShannonAdapter",
+      "role": "白盒 Web/API 自主测试",
+      "url": "https://github.com/KeygraphHQ/shannon"
+    },
+    "cai": {
+      "commands": ["cai"],
+      "adapter": "executor_cai:CAIAdapter",
+      "role": "研究型安全 Agent 编排框架",
+      "url": "https://github.com/aliasrobotics/CAI"
+    },
+    "sigma-cli": {
+      "commands": ["sigma", "sigma-cli"],
+      "adapter": "pending",
+      "role": "Sigma 检测规则转换与验证",
+      "url": "https://github.com/SigmaHQ/sigma-cli"
+    }
+  }
+}

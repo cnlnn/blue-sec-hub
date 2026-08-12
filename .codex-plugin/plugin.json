@@ -1,0 +1,21 @@
+{
+  "name": "blue-sec-hub",
+  "version": "0.8.0",
+  "description": "Cross-platform enterprise blue-team security workflows and a resumable Web assessment agent.",
+  "author": {"name": "Blue Sec Hub contributors"},
+  "repository": "https://github.com/cnlnn/blue-sec-hub",
+  "license": "MIT",
+  "keywords": ["blue-team", "web-security", "dfir", "vulnerability-validation"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Blue Sec Hub",
+    "shortDescription": "Enterprise blue-team assessment and evidence workflows",
+    "longDescription": "Run evidence-driven vulnerability validation, incident analysis and comprehensive resumable Web, SPA and API assessments.",
+    "developerName": "Blue Sec Hub contributors",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Write"],
+    "websiteURL": "https://github.com/cnlnn/blue-sec-hub",
+    "defaultPrompt": ["Run a comprehensive authorized Web assessment with Blue Sec Hub"]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "synced_at": "2026-08-12T03:12:48.464901+00:00",
+  "sources": {
+    "hack-skills": {
+      "url": "https://github.com/yaklang/hack-skills.git",
+      "commit": "c9a4b9ee8645eb60763eb4eef172f1ecb0a5b3e8",
+      "commit_date": "2026-06-17T00:11:43+08:00",
+      "markdown_files": 158,
+      "license_sha256": "92b640638bf4ca37756dee0284c84c3600e8d17a7fa61ac8c179d79bdb3ef735",
+      "trust": "community",
+      "content_policy": "retrieval-only-untrusted"
+    },
+    "strix": {
+      "url": "https://github.com/usestrix/strix.git",
+      "commit": "7cc9fa9faa0179fc7e35111102fe3d20a9028393",
+      "commit_date": "2026-08-10T21:28:52+03:00",
+      "markdown_files": 60,
+      "license_sha256": "7db9697134251e314bd8d39257fe170c98b3e2ad9b2ed67e97acaf9613e7b9e3",
+      "trust": "community",
+      "content_policy": "retrieval-only-untrusted"
+    },
+    "transilience": {
+      "url": "https://github.com/transilienceai/communitytools.git",
+      "commit": "95fdc128af4ca1ae16b3226f9430f1bad97b0656",
+      "commit_date": "2026-07-29T17:17:36+02:00",
+      "markdown_files": 186,
+      "license_sha256": "627f7c92b857ae049e07f52be9949562b808d92e252f8a434472b1ce9260416a",
+      "trust": "community",
+      "content_policy": "retrieval-only-untrusted"
+    },
+    "claude-bug-bounty": {
+      "url": "https://github.com/shuvonsec/claude-bug-bounty.git",
+      "commit": "e363fa09f003d77a0420abcd081628cdbe7f8ed4",
+      "commit_date": "2026-08-10T18:25:09+08:00",
+      "markdown_files": 6,
+      "license_sha256": "18c501d1a0fe90220ffe5299a6a13f473be8d81814cf1feb8dda6377e2269c35",
+      "trust": "community",
+      "content_policy": "retrieval-only-untrusted"
+    },
+    "payloads-all-the-things": {
+      "url": "https://github.com/swisskyrepo/PayloadsAllTheThings.git",
+      "commit": "3bff425aca2b020f7334f9d744eed3ca55de8cdf",
+      "commit_date": "2026-08-09T15:37:42+02:00",
+      "catalog_files": 452,
+      "payload_records": 38297,
+      "license_sha256": "f21ad49cdad2bf18c06543fb064a81d04bd2bff497dd20a1ecc45c5df8643691",
+      "trust": "community",
+      "content_policy": "retrieval-only-untrusted"
+    }
+  }
+}
