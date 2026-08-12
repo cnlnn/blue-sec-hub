@@ -104,6 +104,56 @@
         "风险分析"
       ],
       "minimum_signals": 2
+    },
+    {
+      "id": "legacy-finding-report",
+      "version": 1,
+      "signals": [
+        "漏洞评级",
+        "漏洞位置",
+        "漏洞详情",
+        "数据包：",
+        "请求包如下",
+        "修复建议"
+      ],
+      "minimum_signals": 3
+    },
+    {
+      "id": "legacy-scan-report",
+      "version": 1,
+      "signals": [
+        "扫描测试报告",
+        "漏洞情况统计",
+        "检测工具",
+        "漏洞扫描服务",
+        "安全加固参考"
+      ],
+      "minimum_signals": 3
+    },
+    {
+      "id": "legacy-risk-assessment",
+      "version": 1,
+      "signals": [
+        "网络安全评估报告",
+        "有效性声明",
+        "评估时间",
+        "风险分析",
+        "风险总数",
+        "基线配置核查"
+      ],
+      "minimum_signals": 3
+    },
+    {
+      "id": "incident-trace-report",
+      "version": 1,
+      "signals": [
+        "溯源处置报告",
+        "事件概述",
+        "流量回溯",
+        "攻击手法",
+        "手工复现"
+      ],
+      "minimum_signals": 3
     }
   ]
 }

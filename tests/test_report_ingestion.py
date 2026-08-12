@@ -173,6 +173,60 @@ class ReportIngestionTest(unittest.TestCase):
                 ["POST /api/search"],
             )
 
+    def test_legacy_finding_report_is_accepted_without_filename_trust(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            report = root / "opaque.docx"
+            write_docx(
+                report,
+                "".join(
+                    [
+                        paragraph("业务系统"),
+                        paragraph("垂直越权漏洞"),
+                        paragraph("漏洞评级：高"),
+                        paragraph("漏洞位置：用户管理"),
+                        paragraph("漏洞详情：低权限用户可读取其他用户资料"),
+                        paragraph("数据包：GET /api/users/2 HTTP/1.1"),
+                        paragraph("修复建议：执行对象级权限校验"),
+                    ]
+                ),
+            )
+            data = root / "data"
+            self.run_tool(data, "scan", "--quiet", str(report))
+            artifact = self.artifact(data)
+
+            self.assertEqual(
+                artifact["recognition"]["profile_id"],
+                "legacy-finding-report",
+            )
+            self.assertEqual(artifact["relevance"]["disposition"], "accepted")
+
+    def test_incident_trace_report_is_accepted_as_historical_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            report = root / "trace.docx"
+            write_docx(
+                report,
+                "".join(
+                    [
+                        paragraph("溯源处置报告"),
+                        paragraph("事件概述"),
+                        paragraph("流量回溯"),
+                        paragraph("攻击手法"),
+                        paragraph("手工复现"),
+                    ]
+                ),
+            )
+            data = root / "data"
+            self.run_tool(data, "scan", "--quiet", str(report))
+            artifact = self.artifact(data)
+
+            self.assertEqual(
+                artifact["recognition"]["profile_id"],
+                "incident-trace-report",
+            )
+            self.assertEqual(artifact["relevance"]["disposition"], "accepted")
+
     def test_search_uses_exact_system_and_excludes_unrelated_reports(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
