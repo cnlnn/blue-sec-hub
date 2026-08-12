@@ -35,7 +35,7 @@ DECISIONS = STORE / "decisions.jsonl"
 SCAN_RUNS = STORE / "scan-runs"
 SCAN_STATE = STORE / "scan-state.json"
 CONTRACT_SCHEMA_VERSION = 2
-RELEVANCE_VERSION = 1
+RELEVANCE_VERSION = 2
 MAX_FILE_BYTES = 100 * 1024 * 1024
 SUPPORTED_SUFFIXES = {
     ".csv",
@@ -112,6 +112,11 @@ EVIDENCE_CONTROL_SIGNAL = re.compile(
     r"证据|请求|响应|影响|修复|整改|复现|攻击路径|HTTP/\d(?:\.\d)?|"
     r"evidence|request|response|impact|remediation|reproduction",
     re.IGNORECASE,
+)
+PUBLIC_REFERENCE_SECTIONS = (
+    re.compile(r"(?:^|\n)\s*一[、.]\s*漏洞简介", re.I),
+    re.compile(r"(?:^|\n)\s*二[、.]\s*漏洞影响", re.I),
+    re.compile(r"(?:^|\n)\s*三[、.]\s*复现过程", re.I),
 )
 
 
@@ -245,6 +250,12 @@ def classify_relevance(
             "version": RELEVANCE_VERSION,
             "disposition": "accepted",
             "reasons": ["recognized-security-report"],
+        }
+    if all(pattern.search(text) for pattern in PUBLIC_REFERENCE_SECTIONS):
+        return {
+            "version": RELEVANCE_VERSION,
+            "disposition": "knowledge-reference",
+            "reasons": ["public-reference-section-contract"],
         }
     finding_signal = bool(FINDING_SECTION_SIGNAL.search(text))
     evidence_signal = bool(EVIDENCE_CONTROL_SIGNAL.search(text))
@@ -688,6 +699,7 @@ def cache_key(sha256: str, config: dict[str, Any]) -> str:
             "source_sha256": sha256,
             "contract_schema_version": CONTRACT_SCHEMA_VERSION,
             "extractor_version": EXTRACTOR_VERSION,
+            "relevance_version": RELEVANCE_VERSION,
             "profile_set_version": config["profile_set_version"],
             "profile_set_digest": config["digest"],
         }
@@ -837,16 +849,17 @@ def scan_one(
     target = artifact_path(sha256, key)
     if target.exists() and not force:
         artifact = json.loads(target.read_text(encoding="utf-8"))
-        relevance = artifact.get("relevance", {})
-        return {
-            "state": "current",
-            "source": str(source),
-            "sha256": sha256,
-            "cache_key": key,
-            "target": target,
-            "artifact": artifact,
-            "relevance": relevance,
-        }
+        if artifact_is_current(artifact, config):
+            relevance = artifact.get("relevance", {})
+            return {
+                "state": "current",
+                "source": str(source),
+                "sha256": sha256,
+                "cache_key": key,
+                "target": target,
+                "artifact": artifact,
+                "relevance": relevance,
+            }
     extracted = extract_document(source)
     if extracted is None:
         return {"state": "unsupported", "source": str(source), "sha256": sha256}
@@ -1228,7 +1241,12 @@ def audit_state() -> dict[str, Any]:
         reasons.append("scan-unclassified")
     artifact_paths = {Path(entry.get("artifact", "")) for entry in entries}
     current = stale = 0
-    relevance_counts = {"accepted": 0, "ambiguous": 0, "non-security": 0}
+    relevance_counts = {
+        "accepted": 0,
+        "ambiguous": 0,
+        "knowledge-reference": 0,
+        "non-security": 0,
+    }
     for decision in decisions:
         disposition = str(decision.get("relevance", {}).get("disposition") or "")
         if disposition in relevance_counts:

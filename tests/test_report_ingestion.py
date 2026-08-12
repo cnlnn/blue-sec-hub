@@ -63,6 +63,22 @@ class ReportIngestionTest(unittest.TestCase):
         entry = json.loads(index.read_text(encoding="utf-8").strip())
         return json.loads(Path(entry["artifact"]).read_text(encoding="utf-8"))
 
+    def test_cache_key_changes_with_relevance_contract(self) -> None:
+        import sys
+
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import report_ingestion
+
+        config = report_ingestion.load_profile_config()
+        current = report_ingestion.cache_key("a" * 64, config)
+        with mock.patch.object(
+            report_ingestion,
+            "RELEVANCE_VERSION",
+            report_ingestion.RELEVANCE_VERSION + 1,
+        ):
+            changed = report_ingestion.cache_key("a" * 64, config)
+        self.assertNotEqual(current, changed)
+
     def test_versions_recognizes_redacts_and_reuses_report(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -255,7 +271,7 @@ class ReportIngestionTest(unittest.TestCase):
             )
             self.assertEqual(artifact["relevance"]["disposition"], "accepted")
 
-    def test_security_reference_article_remains_ambiguous(self) -> None:
+    def test_security_reference_article_is_separated_from_reports(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             report = root / "reference.docx"
@@ -273,9 +289,62 @@ class ReportIngestionTest(unittest.TestCase):
             data = root / "data"
             result = self.run_tool(data, "scan", "--quiet", str(report))
 
-            self.assertIn('"ambiguous": 1', result.stdout)
+            self.assertIn('"knowledge-reference": 1', result.stdout)
             index = data / "report-ingestion" / "index.jsonl"
             self.assertEqual(index.read_text(encoding="utf-8"), "")
+
+    def test_legacy_narrative_penetration_report_is_accepted(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            report = root / "legacy.docx"
+            write_docx(
+                report,
+                "".join(
+                    [
+                        paragraph("SQL注入漏洞（高危）"),
+                        paragraph("请求包如下"),
+                        paragraph("GET /search?id=1 HTTP/1.1"),
+                        paragraph("包括但不限于以下URL"),
+                        paragraph("修复建议"),
+                    ]
+                ),
+            )
+            data = root / "data"
+            self.run_tool(data, "scan", "--quiet", str(report))
+            artifact = self.artifact(data)
+
+            self.assertEqual(
+                artifact["recognition"]["profile_id"],
+                "legacy-narrative-penetration",
+            )
+            self.assertEqual(artifact["relevance"]["disposition"], "accepted")
+
+    def test_structured_chain_report_needs_multiple_evidence_sections(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            report = root / "chain.docx"
+            write_docx(
+                report,
+                "".join(
+                    [
+                        paragraph("测试内容(Abstract)"),
+                        paragraph("测试目标(Test targets)"),
+                        paragraph("测试结果(Results)"),
+                        paragraph("【验证对象】"),
+                        paragraph("【POC/验证过程】"),
+                        paragraph("【证据摘要】"),
+                    ]
+                ),
+            )
+            data = root / "data"
+            self.run_tool(data, "scan", "--quiet", str(report))
+            artifact = self.artifact(data)
+
+            self.assertEqual(
+                artifact["recognition"]["profile_id"],
+                "structured-chain-validation",
+            )
+            self.assertEqual(artifact["relevance"]["disposition"], "accepted")
 
     def test_search_uses_exact_system_and_excludes_unrelated_reports(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

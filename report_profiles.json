@@ -205,6 +205,45 @@
         "当前网站资源树如下"
       ],
       "minimum_signals": 4
+    },
+    {
+      "id": "legacy-narrative-penetration",
+      "version": 1,
+      "signals": [
+        "请求包如下",
+        "数据包如下",
+        "请求URL如下",
+        "包括但不限于以下URL",
+        "漏洞（高危）",
+        "漏洞（中危）",
+        "修复建议"
+      ],
+      "minimum_signals": 3
+    },
+    {
+      "id": "adversary-outcome-report",
+      "version": 1,
+      "signals": [
+        "主要工作成果",
+        "攻击路径",
+        "路径一：",
+        "漏洞详情",
+        "工具存放路径"
+      ],
+      "minimum_signals": 3
+    },
+    {
+      "id": "structured-chain-validation",
+      "version": 1,
+      "signals": [
+        "测试内容(Abstract)",
+        "测试目标(Test targets)",
+        "测试结果(Results)",
+        "【验证对象】",
+        "【POC/验证过程】",
+        "【证据摘要】"
+      ],
+      "minimum_signals": 4
     }
   ]
 }
