@@ -90,7 +90,28 @@ EVENT_TYPES = {
     "runner-checkpoint",
     "credential-lease-state",
     "execution-audit",
+    "priority-signal",
+    "priority-change",
+    "queue-preemption",
+    "starvation-promotion",
 }
+PRIORITY_SIGNAL_POINTS = {
+    "attacker-reachable-producer": 3,
+    "controlled-input": 3,
+    "dangerous-sink": 2,
+    "privilege-bridge": 3,
+    "sensitive-consumer": 2,
+    "runtime-differential": 2,
+    "adjacent-confirmed-finding": 2,
+    "prerequisite-near-closure": 3,
+    "evidence-backed-exhaustion": -3,
+    "duplicate-confirmed": -4,
+    "not-applicable-confirmed": -4,
+}
+NEGATIVE_PRIORITY_SIGNALS = {
+    key for key, value in PRIORITY_SIGNAL_POINTS.items() if value < 0
+}
+STARVATION_INTERVAL = 4
 CANDIDATE_DEPENDENCY_STATES = {
     "pending",
     "satisfied",
@@ -1065,6 +1086,200 @@ def priority(score: int) -> str:
     if score >= 6:
         return "P2"
     return "P3"
+
+
+def score_for_priority(value: str | None) -> int:
+    return {"P0": 18, "P1": 13, "P2": 8, "P3": 3}.get(str(value), 8)
+
+
+def priority_signals(events: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    signals: dict[str, list[dict[str, Any]]] = {}
+    for event in events:
+        if event.get("type") != "priority-signal":
+            continue
+        signals.setdefault(str(event["target_id"]), []).append(event)
+    return signals
+
+
+def apply_dynamic_priorities(
+    plan: dict[str, Any], coverage: dict[str, Any], events: list[dict[str, Any]]
+) -> None:
+    """Derive scheduling priority from validated evidence without changing severity."""
+    signals = priority_signals(events)
+    candidates = {str(item.get("id")): item for item in coverage.get("candidates", [])}
+    candidate_surfaces: dict[str, int] = {}
+    for candidate in candidates.values():
+        base = {"critical": 18, "high": 14, "medium": 9, "low": 4}.get(
+            str(candidate.get("investigation_priority") or "medium"), 9
+        )
+        factors = []
+        for signal in signals.get(str(candidate.get("id")), []):
+            factors.append(
+                {
+                    "factor": signal["factor"],
+                    "points": PRIORITY_SIGNAL_POINTS[str(signal["factor"])],
+                    "reason": signal["reason"],
+                    "evidence_refs": list(signal["evidence_refs"]),
+                    "recorded_at": signal.get("recorded_at"),
+                }
+            )
+        dynamic = min(20, max(0, base + sum(int(item["points"]) for item in factors)))
+        candidate.update(
+            {
+                "base_score": base,
+                "base_priority": priority(base),
+                "dynamic_score": dynamic,
+                "current_priority": priority(dynamic),
+                "priority_factors": factors,
+                "priority_revision": stable_id("priority", {"id": candidate.get("id"), "base": base, "factors": factors}),
+            }
+        )
+        pending = candidate_dependency_gaps(candidate)
+        boost = 3 if pending and len(pending) == 1 else 0
+        if candidate.get("investigation_priority") in {"critical", "high"}:
+            boost += 2
+        for surface in candidate.get("surface_refs", []):
+            candidate_surfaces[str(surface)] = max(candidate_surfaces.get(str(surface), 0), boost)
+
+    cells = {str(item["id"]): item for item in plan.get("test_cells", [])}
+    for cell in cells.values():
+        base = int(
+            cell.get(
+                "base_score",
+                cell.get("risk_score", score_for_priority(cell.get("priority"))),
+            )
+        )
+        factors = []
+        for signal in signals.get(str(cell["id"]), []):
+            points = PRIORITY_SIGNAL_POINTS[str(signal["factor"])]
+            factors.append(
+                {
+                    "factor": signal["factor"],
+                    "points": points,
+                    "reason": signal["reason"],
+                    "evidence_refs": list(signal["evidence_refs"]),
+                    "recorded_at": signal.get("recorded_at"),
+                }
+            )
+        dynamic = min(20, max(0, base + sum(int(item["points"]) for item in factors)))
+        cell.update(
+            {
+                "base_score": base,
+                "base_priority": priority(base),
+                "dynamic_score": dynamic,
+                "current_priority": priority(dynamic),
+                "priority": priority(dynamic),
+                "priority_factors": factors,
+                "priority_revision": stable_id("priority", {"id": cell["id"], "base": base, "factors": factors}),
+                "last_prioritized_at": max((str(item.get("recorded_at") or "") for item in factors), default=plan.get("generated_at")),
+            }
+        )
+
+    preemptions: dict[str, int] = {}
+    for event in events:
+        if event.get("type") == "queue-preemption" and event.get("deferred_id"):
+            key = str(event["deferred_id"])
+            preemptions[key] = preemptions.get(key, 0) + 1
+    for case in plan.get("executable_cases", []):
+        cell = cells.get(str(case.get("test_cell_id")), {})
+        base = int(
+            case.get(
+                "base_score",
+                cell.get(
+                    "base_score",
+                    case.get("risk_score", score_for_priority(case.get("priority"))),
+                ),
+            )
+        )
+        factors = [*cell.get("priority_factors", [])]
+        for signal in signals.get(str(case["id"]), []):
+            factors.append(
+                {
+                    "factor": signal["factor"],
+                    "points": PRIORITY_SIGNAL_POINTS[str(signal["factor"])],
+                    "reason": signal["reason"],
+                    "evidence_refs": list(signal["evidence_refs"]),
+                    "recorded_at": signal.get("recorded_at"),
+                }
+            )
+        surface_boost = candidate_surfaces.get(str(case.get("surface_ref")), 0)
+        if surface_boost:
+            factors.append({"factor": "candidate-chain-closure", "points": surface_boost, "reason": "an unresolved high-priority candidate on this surface is near closure", "evidence_refs": []})
+        dynamic = min(20, max(0, base + sum(int(item["points"]) for item in factors)))
+        case.update(
+            {
+                "base_score": base,
+                "base_priority": priority(base),
+                "dynamic_score": dynamic,
+                "current_priority": priority(dynamic),
+                "priority": priority(dynamic),
+                "priority_factors": factors,
+                "priority_revision": stable_id("priority", {"id": case["id"], "base": base, "factors": factors}),
+                "defer_count": preemptions.get(str(case["id"]), 0),
+                "queue_age": preemptions.get(str(case["id"]), 0),
+                "next_validation_step": case.get("action") or case.get("description"),
+            }
+        )
+        if surface_boost or any(item["factor"] == "prerequisite-near-closure" for item in factors):
+            case["execution_lane"] = "chain-closure"
+
+
+def scheduled_execution_queue(cases: list[dict[str, Any]]) -> list[str]:
+    pending = [
+        item for item in cases
+        if item.get("status") in {"queued", "running", "mapped"}
+        and item.get("safety") in ACTIONABLE_SAFETY
+    ]
+    chain = [item for item in pending if item.get("execution_lane") == "chain-closure"]
+    fast = [item for item in pending if item.get("execution_lane") == "fast-find"]
+    coverage = [item for item in pending if item.get("execution_lane") == "coverage-close"]
+    key = lambda item: (-int(item.get("dynamic_score", 0)), -int(item.get("defer_count", 0)), str(item["id"]))
+    chain.sort(key=key)
+    fast.sort(key=key)
+    coverage.sort(key=key)
+    ordered = [*chain]
+    high = [*fast]
+    while high:
+        ordered.extend(high[:STARVATION_INTERVAL])
+        high = high[STARVATION_INTERVAL:]
+        if coverage:
+            ordered.append(coverage.pop(0))
+    ordered.extend(coverage)
+    return [str(item["id"]) for item in ordered]
+
+
+def prioritize_prerequisites(
+    graph: dict[str, Any], coverage: dict[str, Any], events: list[dict[str, Any]]
+) -> None:
+    signals = priority_signals(events)
+    candidate_scores = {
+        str(item.get("id")): int(item.get("dynamic_score", 9))
+        for item in coverage.get("candidates", [])
+    }
+    for item in graph.get("prerequisites", []):
+        base = candidate_scores.get(str(item.get("owner_id")), 9)
+        factors = []
+        for signal in signals.get(str(item.get("id")), []):
+            factors.append(
+                {
+                    "factor": signal["factor"],
+                    "points": PRIORITY_SIGNAL_POINTS[str(signal["factor"])],
+                    "reason": signal["reason"],
+                    "evidence_refs": list(signal["evidence_refs"]),
+                    "recorded_at": signal.get("recorded_at"),
+                }
+            )
+        dynamic = min(20, max(0, base + sum(int(value["points"]) for value in factors)))
+        item.update(
+            {
+                "base_score": base,
+                "base_priority": priority(base),
+                "dynamic_score": dynamic,
+                "current_priority": priority(dynamic),
+                "priority_factors": factors,
+                "priority_revision": stable_id("priority", {"id": item.get("id"), "base": base, "factors": factors}),
+            }
+        )
 
 
 FAST_FIND_FAMILIES = {
@@ -3607,6 +3822,25 @@ def validate_event_shape(event: dict[str, Any]) -> None:
     elif event_type == "execution-audit":
         if event.get("status") not in {"passed", "blocked"}:
             raise ValueError("execution-audit status must be passed or blocked")
+    elif event_type == "priority-signal":
+        if event.get("target_kind") not in {"test-cell", "test-case", "candidate", "prerequisite"}:
+            raise ValueError("priority-signal has invalid target_kind")
+        if not event.get("target_id"):
+            raise ValueError("priority-signal requires target_id")
+        factor = str(event.get("factor") or "")
+        if factor not in PRIORITY_SIGNAL_POINTS:
+            raise ValueError(f"invalid priority signal factor: {factor}")
+        if not str(event.get("reason") or "").strip() or not event.get("evidence_refs"):
+            raise ValueError("priority-signal requires reason and evidence_refs")
+        if "score" in event or "priority" in event:
+            raise ValueError("priority-signal cannot set the final score or priority")
+        if factor in NEGATIVE_PRIORITY_SIGNALS and event.get("evidence_state") not in {
+            "confirmed", "exhausted-with-evidence"
+        }:
+            raise ValueError("negative priority signal requires confirmed evidence")
+    elif event_type in {"priority-change", "queue-preemption", "starvation-promotion"}:
+        if not event.get("target_id") and not event.get("deferred_id"):
+            raise ValueError(f"{event_type} requires a target reference")
     elif event_type in {"route-result", "control-result"}:
         if not event.get("test_case_id"):
             raise ValueError(f"{event_type} requires test_case_id")
@@ -5299,6 +5533,7 @@ def initialize(workspace: Path, target: str) -> None:
             "queue": [],
             "execution_queue": [],
             "execution_lanes": {
+                "chain-closure": {"queue": [], "resolved": 0},
                 "fast-find": {"queue": [], "resolved": 0},
                 "coverage-close": {"queue": [], "resolved": 0},
             },
@@ -5494,6 +5729,7 @@ def compile_workspace(
         "queue": [],
         "execution_queue": [],
         "execution_lanes": {
+            "chain-closure": {"queue": [], "resolved": 0},
             "fast-find": {"queue": [], "resolved": 0},
             "coverage-close": {"queue": [], "resolved": 0},
         },
@@ -5518,6 +5754,7 @@ def compile_workspace(
         case.setdefault("priority", cell.get("priority", "P2"))
         case.setdefault("family", cell.get("family"))
         decorate_case(case)
+        case["execution_lane"] = execution_lane(case)
     plan["executable_cases"] = combined_cases
     prerequisite_graph = build_prerequisite_graph(
         workspace, coverage, plan, combined_cases
@@ -5563,11 +5800,15 @@ def compile_workspace(
         ),
         "confirmation_policy": knowledge_catalog.get("finding_policy"),
     }
+    apply_dynamic_priorities(plan, coverage, read_events(workspace))
+    prioritize_prerequisites(prerequisite_graph, coverage, read_events(workspace))
+    atomic_json(workspace / "prerequisite-graph.json", prerequisite_graph)
     plan["executable_cases"] = sorted(
         combined_cases,
         key=lambda case: (
-            0 if case.get("execution_lane") == "fast-find" else 1,
-            int(case.get("priority", "P2")[1]),
+            {"chain-closure": 0, "fast-find": 1, "coverage-close": 2}.get(case.get("execution_lane"), 3),
+            int(case.get("current_priority", "P2")[1]),
+            -int(case.get("defer_count", 0)),
             {"route-navigation": 0, "ui-interaction": 1, "api-test": 2}.get(
                 case.get("case_kind"), 3
             ),
@@ -5584,13 +5825,8 @@ def compile_workspace(
         for cell in plan["test_cells"]
         if cell["status"] not in RESOLVED
     ]
-    plan["execution_queue"] = [
-        case["id"]
-        for case in plan["executable_cases"]
-        if case["status"] in {"queued", "running", "mapped"}
-        and case["safety"] in ACTIONABLE_SAFETY
-    ]
-    for lane in ("fast-find", "coverage-close"):
+    plan["execution_queue"] = scheduled_execution_queue(plan["executable_cases"])
+    for lane in ("chain-closure", "fast-find", "coverage-close"):
         lane_cases = [
             case
             for case in plan["executable_cases"]
@@ -5628,6 +5864,42 @@ def compile_workspace(
             }
         )
         plan["replan_history"] = history[-200:]
+    plan["priority_engine"] = {
+        "schema_version": 1,
+        "revision": stable_id(
+            "priority-engine",
+            {
+                "cases": [
+                    [item["id"], item.get("priority_revision")]
+                    for item in plan["executable_cases"]
+                ],
+                "queue": plan["execution_queue"],
+            },
+        ),
+        "starvation_interval": STARVATION_INTERVAL,
+        "unverified_signals": 0,
+        "stale_nodes": 0,
+    }
+    old_cases = {
+        str(item.get("id")): item for item in old_plan.get("executable_cases", [])
+    }
+    for item in plan["executable_cases"]:
+        previous = old_cases.get(str(item.get("id")), {})
+        old_score = previous.get("dynamic_score", previous.get("risk_score"))
+        if old_score is not None and old_score != item.get("dynamic_score"):
+            append_event(
+                workspace,
+                {
+                    "type": "priority-change",
+                    "target_id": item["id"],
+                    "from_score": old_score,
+                    "to_score": item.get("dynamic_score"),
+                    "from_priority": previous.get("current_priority", previous.get("priority")),
+                    "to_priority": item.get("current_priority"),
+                    "priority_revision": item.get("priority_revision"),
+                    "reason": "deterministic evidence-driven reprioritization",
+                },
+            )
     derive_coverage(coverage, plan, inventory, evidence_index, route_inventory)
     agent_state = read_json(workspace / "agent-state.json", {})
     if agent_state:
@@ -5788,6 +6060,65 @@ def next_cell(workspace: Path) -> dict[str, Any] | None:
     return None
 
 
+def reprioritize_workspace(workspace: Path, *, apply: bool) -> dict[str, Any]:
+    ensure_workspace(workspace)
+    before = read_json(workspace / "test-plan.json", {})
+    if apply:
+        compile_workspace(workspace)
+        after = read_json(workspace / "test-plan.json", {})
+    else:
+        after = copy.deepcopy(before)
+        coverage = read_json(workspace / "coverage.json", {})
+        apply_dynamic_priorities(after, coverage, read_events(workspace))
+        after["execution_queue"] = scheduled_execution_queue(after.get("executable_cases", []))
+    previous = {str(item.get("id")): item for item in before.get("executable_cases", [])}
+    changes = []
+    for item in after.get("executable_cases", []):
+        old = previous.get(str(item.get("id")), {})
+        if old.get("dynamic_score", old.get("risk_score")) == item.get("dynamic_score"):
+            continue
+        changes.append(
+            {
+                "target_id": item.get("id"),
+                "from_score": old.get("dynamic_score", old.get("risk_score")),
+                "to_score": item.get("dynamic_score"),
+                "from_priority": old.get("current_priority", old.get("priority")),
+                "to_priority": item.get("current_priority"),
+                "priority_revision": item.get("priority_revision"),
+            }
+        )
+    return {
+        "status": "applied" if apply else "dry-run",
+        "priority_revision": after.get("priority_engine", {}).get("revision"),
+        "changes": changes,
+        "execution_queue": after.get("execution_queue", []),
+    }
+
+
+def explain_queue(workspace: Path) -> dict[str, Any]:
+    compile_workspace(workspace)
+    plan = read_json(workspace / "test-plan.json", {})
+    cases = {str(item["id"]): item for item in plan.get("executable_cases", [])}
+    return {
+        "priority_engine": plan.get("priority_engine", {}),
+        "queue": [
+            {
+                "position": position,
+                "id": item_id,
+                "lane": cases[item_id].get("execution_lane"),
+                "base_score": cases[item_id].get("base_score"),
+                "dynamic_score": cases[item_id].get("dynamic_score"),
+                "current_priority": cases[item_id].get("current_priority"),
+                "defer_count": cases[item_id].get("defer_count", 0),
+                "priority_factors": cases[item_id].get("priority_factors", []),
+                "next_validation_step": cases[item_id].get("next_validation_step"),
+            }
+            for position, item_id in enumerate(plan.get("execution_queue", []), 1)
+            if item_id in cases
+        ],
+    }
+
+
 def parse_input(value: str) -> tuple[str, Path]:
     if "=" not in value:
         raise argparse.ArgumentTypeError("input must use KIND=PATH")
@@ -5840,6 +6171,14 @@ def main() -> None:
     migrate_parser.add_argument("--workspace", required=True, type=Path)
     migrate_parser.add_argument("--target")
 
+    reprioritize_parser = subparsers.add_parser("reprioritize")
+    reprioritize_parser.add_argument("--workspace", required=True, type=Path)
+    reprioritize_parser.add_argument("--dry-run", action="store_true")
+
+    queue_parser = subparsers.add_parser("queue")
+    queue_parser.add_argument("--workspace", required=True, type=Path)
+    queue_parser.add_argument("--explain", action="store_true")
+
     args = parser.parse_args()
     try:
         if args.command == "init":
@@ -5886,6 +6225,12 @@ def main() -> None:
             coverage = ensure_workspace(args.workspace, args.target)
             atomic_json(args.workspace / "coverage.json", coverage)
             result = compile_workspace(args.workspace)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        elif args.command == "reprioritize":
+            result = reprioritize_workspace(args.workspace, apply=not args.dry_run)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        elif args.command == "queue":
+            result = explain_queue(args.workspace)
             print(json.dumps(result, ensure_ascii=False, indent=2))
     except (FileNotFoundError, ValueError, json.JSONDecodeError) as error:
         print(f"error: {error}", file=sys.stderr)

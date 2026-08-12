@@ -379,6 +379,27 @@ def main() -> None:
             "unresolved_high_priority_candidates": 0,
         }
     )
+    priority_health = {
+        "status": "not-exposed",
+        "priority_revision": None,
+        "unverified_priority_signals": 0,
+        "starvation_guard": "configured",
+        "stale_priority_nodes": 0,
+    }
+    if conclusion_workspace:
+        priority_plan = effective_skills.load_json(
+            Path(conclusion_workspace) / "test-plan.json", {}
+        )
+        engine = priority_plan.get("priority_engine", {})
+        priority_health = {
+            "status": "ready" if engine.get("revision") else "not-built",
+            "priority_revision": engine.get("revision"),
+            "unverified_priority_signals": int(engine.get("unverified_signals", 0)),
+            "starvation_guard": (
+                "ready" if int(engine.get("starvation_interval", 0)) > 0 else "degraded"
+            ),
+            "stale_priority_nodes": int(engine.get("stale_nodes", 0)),
+        }
     health_status = (
         "ready"
         if learning_status["status"] == "ready"
@@ -414,6 +435,8 @@ def main() -> None:
                     },
                     "learning": learning_status,
                     "effective": effective_status,
+                    "effective_tree_match": effective_status.get("effective_tree_match", False),
+                    "legacy_task_pins": effective_status.get("legacy_task_pins", 0),
                     "task_pin_health": effective_status.get("task_pin_health", {}),
                     "report_index": report_index_status,
                     "distillation_run": distillation_status,
@@ -434,6 +457,7 @@ def main() -> None:
                     "conclusion_contract": conclusion_contract,
                     "invalid_confirmed_claims": conclusion_health["invalid_confirmed_claims"],
                     "unresolved_high_priority_candidates": conclusion_health["unresolved_high_priority_candidates"],
+                    "priority_engine": priority_health,
                     "runtime": runtime,
                     "platforms": platform_matrix,
                 },

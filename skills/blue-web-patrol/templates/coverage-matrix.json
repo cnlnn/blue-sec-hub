@@ -46,6 +46,7 @@
     "last_refresh_state": "not-started"
   },
   "execution_lanes": {
+    "chain-closure": {"queued": 0, "resolved": 0},
     "fast-find": {"queued": 0, "resolved": 0, "first_finding_at": null},
     "coverage-close": {"queued": 0, "resolved": 0}
   },

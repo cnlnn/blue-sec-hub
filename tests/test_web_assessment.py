@@ -48,6 +48,66 @@ class WebAssessmentTest(unittest.TestCase):
         self.run_cli("init", "--target", target, "--out", str(workspace))
         return workspace
 
+    def test_priority_signal_requires_evidence_and_cannot_set_final_score(self) -> None:
+        valid = {
+            "type": "priority-signal",
+            "target_kind": "test-case",
+            "target_id": "case-1",
+            "factor": "attacker-reachable-producer",
+            "reason": "a current public producer was observed",
+            "evidence_refs": ["evidence/producer.json"],
+        }
+        web_assessment.validate_event_shape(valid)
+        with self.assertRaises(ValueError):
+            web_assessment.validate_event_shape({**valid, "score": 20})
+        with self.assertRaises(ValueError):
+            web_assessment.validate_event_shape(
+                {**valid, "factor": "evidence-backed-exhaustion"}
+            )
+
+    def test_dynamic_priority_and_starvation_guard_are_deterministic(self) -> None:
+        plan = {
+            "generated_at": "2026-08-12T00:00:00+00:00",
+            "test_cells": [
+                {"id": "cell-high", "risk_score": 12},
+                {"id": "cell-low", "risk_score": 4},
+            ],
+            "executable_cases": [
+                *[
+                    {
+                        "id": f"high-{index}",
+                        "test_cell_id": "cell-high",
+                        "status": "queued",
+                        "safety": "read-only",
+                        "execution_lane": "fast-find",
+                    }
+                    for index in range(5)
+                ],
+                {
+                    "id": "low",
+                    "test_cell_id": "cell-low",
+                    "status": "queued",
+                    "safety": "read-only",
+                    "execution_lane": "coverage-close",
+                },
+            ],
+        }
+        events = [
+            {
+                "type": "priority-signal",
+                "target_kind": "test-case",
+                "target_id": "high-0",
+                "factor": "controlled-input",
+                "reason": "current attacker input reached the parser",
+                "evidence_refs": ["evidence/input.json"],
+                "recorded_at": "2026-08-12T00:01:00+00:00",
+            }
+        ]
+        web_assessment.apply_dynamic_priorities(plan, {"candidates": []}, events)
+        queue = web_assessment.scheduled_execution_queue(plan["executable_cases"])
+        self.assertEqual(15, plan["executable_cases"][0]["dynamic_score"])
+        self.assertLessEqual(queue.index("low"), web_assessment.STARVATION_INTERVAL)
+
     def test_init_creates_resumable_artifacts_and_pinned_standards(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             workspace = self.initialize(Path(temporary))
@@ -788,9 +848,10 @@ class WebAssessmentTest(unittest.TestCase):
                 families,
             )
             self.assertEqual(
-                [{"id": "preserve-me"}],
-                reconciled["candidates"],
+                "preserve-me",
+                reconciled["candidates"][0]["id"],
             )
+            self.assertEqual("P2", reconciled["candidates"][0]["current_priority"])
             self.assertTrue(reconciled["planner_template_sha256"])
             self.assertIn(
                 "platform-exposure.client-bootstrap-config",
