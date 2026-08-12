@@ -62,45 +62,11 @@ python scripts/build_object_graph.py <asset-dir> --out <output-dir>
 
 ## Surface Closure Contract
 
-不存在一种前端采集器能证明所有站点绝对“零遗漏”：仅存在于服务端、未下发给当前
-身份、受租户/功能开关/业务状态控制或必须经特定操作才加载的功能，无法从匿名前端
-凭空推出。本 Skill 的强制保证是**不静默遗漏**，而不是用不真实的“全量”结论掩盖
-未知范围。
-
-1. 功能点、路由和 API 分开采集，再以源码位置、DOM 控件、路由定义、运行时请求和
-   权限标识关联。当前菜单、当前页面或一个路由列表都不能单独代表完整攻击面。
-2. 静态入口 HTML、bootstrap 配置、主 bundle、lazy chunk、manifest、source map，
-   以及浏览器运行时新加载资源必须逐项记为已获取、失败或拒绝；队列剩余、解析失败、
-   导航失败不能消失在汇总数字中。只有 HTML 标签、source map 注释、显式
-   `import/Worker` 或具备强资源路径结构的字符串可以进入下载队列；普通业务字符串
-   中恰好以 `.js` 结尾的值不能制造大量假资源。
-3. 浏览器只把完成导航且确认渲染的页面记为 `pagesVisited`；超时、异常、`404/410`、
-   登录跳转、空白页和 SPA fallback 单列。Hash 路由的 fragment 必须保留，fragment
-   内查询值单独脱敏，不能把不同
-   路由折叠为根页面。DOM 中的链接、按钮、表单、`input/select/textarea` 和可交互
-   控件进入功能清单，即使为避免写操作没有点击也不能丢弃；不得采集输入值。
-4. API 地址只可从完整绝对 URL、以 `/` 开头的同源根路径、已观测 `baseURL/proxy`
-   或运行时请求解析。相对字符串、拼接表达式、跨域地址和解析器残片不得猜测拼接，
-   必须保留为 rejected/unresolved 候选并写明原因。
-5. `validApis` 只统计浏览器真实请求，或安全只读探测得到的 `reachable/recognized`
-   响应。真实 `404/410`、JSON/HTML 中的假 `200` 未找到页、与随机不存在路径高度
-   相似的 SPA fallback 均排除。跳转后的登录页、业务 JSON 中的认证/参数/服务错误
-   只能标记为 `recognized`，不能当成成功响应；`401/403` 只证明接口边界被识别，
-   不证明有权限或能读取数据。
-6. `POST/PUT/PATCH/DELETE` 不因静态存在而自动发送。只有已捕获的正常请求，或使用
-   自有测试对象、最小扰动并完成清理的验证，才能从 `unverified` 升级。GET 路径
-   含重置、发送、退出、创建、更新、执行、审批、导入导出等副作用语义时也禁止盲探。
-7. 身份、角色、租户、业务状态、功能开关和服务端菜单作为覆盖维度。优先从现有账号、
-   页面、菜单响应和配置自动生成 coverage context，不要求用户手工填授权表；无法
-   自动确认的维度保留为完成阻塞项。
-8. 资产队列未清空、资源/导航失败、路由未完成
-   `current-validated -> navigated -> rendered -> controls-extracted -> runtime-api-linked`、
-   可见控件未映射、API 未验证或身份/状态维度未知时，`assessmentState` 必须是
-   `interim`，禁止写“已完整提取”。
-9. 安全只读探测同时使用保留域 Origin 检查 CORS。仅当响应精确反射该 Origin 时生成
-   候选；多重 `Access-Control-Allow-Origin`、真实 `404/410` 和浏览器不可读响应
-   不得误报为可利用 CORS。凭据型候选还需浏览器验证 Cookie 是否实际携带及响应是否
-   可读，业务数据影响再由授权账号复测。
+仅存在于服务端、未下发给当前身份或受业务状态控制的功能无法从匿名前端凭空推出，
+因此本 Skill 保证“不静默遗漏”，不声称绝对零遗漏。功能、路由、资源、控件、API、
+身份和状态必须分别结算；队列、失败、拒绝和未知维度全部保留。`validApis` 仅包含运行时
+请求或经安全只读验证的接口，`401/403`、假 `200` 和静态字符串不能升级为成功或漏洞。
+完整九项规则见 [surface-closure.md](references/surface-closure.md)。
 
 ## Taxonomy
 

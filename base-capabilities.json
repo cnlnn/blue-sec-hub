@@ -24,7 +24,7 @@
       "skill": "blue-web-patrol",
       "match_terms": ["historical route inventory", "route navigation", "runtime api linking"],
       "anchors": [
-        {"path": "skills/blue-web-patrol/SKILL.md", "contains": "当前路由完成当前验证、导航、渲染、控件提取、运行时 API 关联"}
+        {"path": "skills/blue-web-patrol/SKILL.md", "contains": "runtime-api-linked -> tests-resolved"}
       ]
     },
     {
@@ -59,8 +59,8 @@
       "skill": "spa-security-object-graph",
       "match_terms": ["relative child routes", "dynamic-menu", "unparsed http 200"],
       "anchors": [
-        {"path": "skills/spa-security-object-graph/SKILL.md", "contains": "功能点、路由和 API 分开采集"},
-        {"path": "skills/spa-security-object-graph/SKILL.md", "contains": "解析失败"}
+        {"path": "skills/spa-security-object-graph/references/surface-closure.md", "contains": "功能点、路由和 API 分开采集"},
+        {"path": "skills/spa-security-object-graph/references/surface-closure.md", "contains": "失败或拒绝"}
       ]
     },
     {

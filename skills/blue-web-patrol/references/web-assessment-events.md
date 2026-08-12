@@ -157,3 +157,12 @@ surface fingerprint；攻击面变化后重新排队。
 
 网络失败、验证码、WAF、限速、工具缺失和凭据失效不能被记作安全结论。保留失败证据、
 解除条件和重试时间后继续其他可执行单元。
+
+## Dynamic Priority Events
+
+AI 只能提交带 `target_kind`、`target_id`、受支持 `factor`、`reason` 和非空
+`evidence_refs` 的 `priority-signal`，不得提交最终分数或正式严重性。负向因素还必须声明
+`evidence_state=confirmed|exhausted-with-evidence`；超时、随机对象空响应、扫描器无结果、
+网络失败和账号缺失不能降级。运行时确定性生成 `priority-change`；实际抢占和公平调度可记录
+`queue-preemption`、`starvation-promotion`。这些事件只改变执行顺序，不改变范围、结论状态、
+CVSS 或完成门槛。

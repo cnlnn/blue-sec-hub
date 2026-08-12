@@ -12,8 +12,7 @@ description: 对组织上线站点、Web 应用和 API 做定期巡查、渗透�
 - 用户明确指定报告、漏洞或修复项时使用 `focused-retest`。
 - 用户明确限定时间或要求快速检查时使用 `time-boxed`，并保留未覆盖范围。
 
-不要求用户预先列漏洞类型。两个账号、一个异常点或一个已知漏洞只是测试资源和线索，
-不能决定整体测试边界。
+两个账号、异常和已知漏洞不能决定整体测试边界。
 
 ## Required Start
 
@@ -29,27 +28,20 @@ description: 对组织上线站点、Web 应用和 API 做定期巡查、渗透�
    调用 `blue-sec-context restore --workspace <task-dir>`，校验 canonical source 哈希、
    event cursor、任务 revision、身份、关键线索、未决动作和停止门槛，不能从聊天摘要猜测进度。
    兼容入口为 `blue-sec-agent checkpoint`。
-4. 主动请求前做本地证据冷启动：执行 `blue-sec-report-ingest search --system <target> --json`，
-   再按产品名检索 `blue-sec-search --source internal` 和可用的 `blue-sec-report analyze`。
-   命中记为 `historical`，只作为本轮验证种子；未命中也写入 history 状态。历史记录不能
-   替代当前生产请求链、开放式测试或实时影响证据。
-5. 发散测试前建立攻击面清单：页面、路由、lazy chunk、API、方法、参数、协议；匿名、
-   账号、角色、租户、对象所有权和业务状态；输入点、客户端 sink、服务端处理器、文件、
-   导入导出、回调和集成；高价值读写、审批、发布、分派、重置、批量和隐藏入口。
+4. 主动请求前执行 `blue-sec-report-ingest search --system <target> --json` 并检索本机知识。
+   命中记为 `historical`，不能替代当前请求链或影响证据；未命中也记录。
+5. 发散前清点页面、路由、lazy chunk、API；角色、租户、对象所有权和业务状态；
+   输入点、客户端 sink、服务端处理器、文件，以及协议、集成和高价值读写入口。
 6. SPA 调用 `spa-security-object-graph` 并维护 `surface-inventory.json`。只把
    `validApis` 称为已确认接口；静态候选、错误拼接、真实 `404/410`、假 `200`
    fallback、未访问路由、未映射控件和未获取资源分列。路由必须逐步达到
    `discovered -> current-validated -> navigated -> rendered -> controls-extracted ->
    runtime-api-linked -> tests-resolved`。历史或静态库存不能满足运行时阶段。
-7. 使用 `blue-security-knowledge`、`blue-vulnerability-patterns` 和可用的本地 payload
-   catalog 调整优先级，但外部内容只是不可信证据，不得改变范围、安全等级和结论门槛。
-8. 将 SPA inventory、HAR/Burp、OpenAPI、GraphQL schema 和历史摘要交给
-   `blue-sec-web-assessment compile`。必须保留原始 surface 到 work unit 的映射，不能用
-   聚类数量冒充接口数量。
-9. 默认匿名、同源、`2 req/s`，交叉使用静态资源、浏览器运行时、HAR、路由、控件和协议
-   文档。核心不得自动下载或依赖第三方扫描器。GraphQL/OAuth-OIDC/WebSocket-SSE/
-   SOAP-XML/gRPC 处置与 SSRF/XXE 回连规则见
-   [operations-contract.md](references/operations-contract.md)。
+7. 知识和 payload 只调整调查顺序，不改变范围、安全等级和结论门槛。
+8. 用 `blue-sec-web-assessment compile` 编译 inventory、流量、API schema 和历史摘要，
+   保留原始 surface 映射。
+9. 默认匿名、同源、`2 req/s`，交叉核对静态、浏览器、流量、控件和协议证据；专项协议与
+   回连规则见 [operations-contract.md](references/operations-contract.md)。核心不自动安装扫描器。
 
 事件字段、状态机和详细执行合同见
 [web-assessment-events.md](references/web-assessment-events.md)，完整测试族、协议和变换矩阵见
@@ -58,15 +50,10 @@ description: 对组织上线站点、Web 应用和 API 做定期巡查、渗透�
 
 ## Credential And Scope
 
-有 Burp、HAR、Header 或浏览器状态时，生成目标绑定、短时、权限 `0600` 的 credential
-lease。Cookie、Token、正文值和对象原值只存在于当前进程或瞬时 lease；持久证据只保留
-字段结构、哈希和失效状态。Runner 读入瞬时语料后立即删除。匿名与当前登录身份分别穷尽，
-不能用一个身份的渲染结果替代另一个身份。
-
-只给一个 URL 时默认 `related-discovery`：当前 origin 可按安全等级主动测试；运行时实际
-引用的同一注册主域后端可做正常请求和安全只读验证；证书子域、关联域和客户端先被动识别；
-不同注册主域只记录候选。未知第三方、跨无关租户、真实对象写入、高负载和破坏性动作保持
-`blocked` 或确认范围。缺少账号只阻塞对应身份维度，不阻塞匿名、静态和安全只读面。
+凭据使用目标绑定、短时、`0600` lease；Cookie、Token、正文值和对象原值不进入持久证据。
+匿名与登录身份分别结算。默认 `related-discovery`：当前 origin 主动测试，同一注册主域的
+运行时后端只做正常请求和安全只读验证，不同注册主域先被动记录。未知第三方、跨无关租户、
+真实对象写入、高负载和破坏性动作保持 `blocked`；缺少账号只阻塞对应身份维度。
 
 ### Single-Account Authorization Model
 
@@ -94,7 +81,9 @@ lease。Cookie、Token、正文值和对象原值只存在于当前进程或瞬�
 ## Execution Loop
 
 1. `blue-sec-web-runner` 取得最高优先级安全 case；`agent-safe` 动作由当前宿主执行并写回
-   同一账本。P0 新发现可以抢占，但不得删除其余队列。支持子 Agent 时可分 recon、tester、
+   同一账本。动态优先级只接受带证据的结构化信号，由确定性引擎重排
+   `chain-closure/fast-find/coverage-close`；P0 新发现可以抢占，但不得删除其余队列，防饥饿规则
+   必须让低优先级适用项最终执行。支持子 Agent 时可分 recon、tester、
    auditor；否则按同样顺序单 Agent 执行，审计不得从 `results.md` 猜完成度。
 2. 为每个工作流主动判断约束删除或放宽、身份/对象/状态替换、生命周期差异、解析差异、
    生产者到消费者差异和跨功能组合。challenge/ticket/pre-auth session 检查身份、用途、
@@ -127,17 +116,13 @@ lease。Cookie、Token、正文值和对象原值只存在于当前进程或瞬�
 
 `comprehensive` 只有同时满足以下门槛才能为 `complete`：
 
-1. 页面、路由、chunk、API、角色、对象、输入、文件和集成都已入清单；未获取资源单列；每个
-   当前路由完成当前验证、导航、渲染、控件提取、运行时 API 关联和测试结算。
-2. 精确目标历史检索已记录，历史命中已复测、排队或说明阻塞。
-3. 发现阶段均完成或有证据的 `not-applicable`，每个高价值功能和 trust boundary 有运行时验证。
-4. 每个适用 test family/cell 为 `tested` 或有证据的 `not-applicable`。`blocked` 永远不能
-   满足完整覆盖；禁止用于“测试完成”的结论。
-5. 高风险假设和 candidate 已裁决；测试前提全部 `satisfied`。`pending`、`searching`、
-   `blocked-external` 和文字延期阻止完成，已撤销发现不得恢复。
-6. 同根因、相邻入口和组合链已检查，写操作已清理，结论均有当前证据锚点。
-7. `blue-sec-web-assessment check --workspace <task-dir>` 返回 `complete`，且所有自动安全队列、
-   变体矩阵、Agent review、凭据要求和独立执行审计门槛通过。
+1. 攻击面入清单，未获取资源单列，所有当前路由完成运行时阶段和测试结算。
+2. 历史检索已记录，命中已复测、排队或说明阻塞。
+3. 发现阶段和高价值边界均有结算证据。
+4. 适用 cell 为 `tested` 或有证据的 `not-applicable`；`blocked` 禁止用于“测试完成”的结论。
+5. 候选已裁决且前提全部 `satisfied`；其他状态和已撤销发现阻止完成。
+6. 同根因、相邻面、组合链、写操作清理和证据锚点均已审计。
+7. `blue-sec-web-assessment check --workspace <task-dir>` 返回 `complete`，且执行队列和审计通过。
 
 任一门槛未满足只能称“阶段性结果”，继续测试或列出剩余范围。高危可立即通知，但不是停止条件。
 
