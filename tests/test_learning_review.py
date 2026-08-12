@@ -676,13 +676,19 @@ class LearningContentPlaneTest(unittest.TestCase):
                 self.assertEqual(1, applied["counts"]["released"])
                 remaining = {item["task_id"] for item in effective_skills.task_pins()}
                 self.assertEqual({"task-active", "legacy-task"}, remaining)
+                migrated = next(
+                    item for item in effective_skills.task_pins()
+                    if item["task_id"] == "legacy-task"
+                )
+                self.assertEqual(2, migrated["schema_version"])
+                self.assertEqual("quarantined-unverifiable", migrated["migration_state"])
             finally:
                 if previous is None:
                     os.environ.pop("BLUE_SEC_DATA", None)
                 else:
                     os.environ["BLUE_SEC_DATA"] = previous
 
-    def test_effective_status_degrades_when_code_revision_moves(self) -> None:
+    def test_effective_status_uses_source_tree_not_rewritten_commit_identity(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             previous = os.environ.get("BLUE_SEC_DATA")
             os.environ["BLUE_SEC_DATA"] = temporary
@@ -691,8 +697,11 @@ class LearningContentPlaneTest(unittest.TestCase):
                 self.assertEqual("ready", effective_skills.status()["status"])
                 with mock.patch.object(effective_skills, "repository_revision", return_value="new-main-revision"):
                     value = effective_skills.status()
+                self.assertEqual("ready", value["status"])
+                with mock.patch.object(effective_skills, "repository_tree_sha256", return_value="changed-tree"):
+                    value = effective_skills.status()
                 self.assertEqual("degraded", value["status"])
-                self.assertIn("active snapshot was compiled from a different code revision", value["failures"])
+                self.assertIn("active snapshot was compiled from a different source tree", value["failures"])
             finally:
                 if previous is None:
                     os.environ.pop("BLUE_SEC_DATA", None)

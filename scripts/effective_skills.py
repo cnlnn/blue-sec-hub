@@ -104,6 +104,34 @@ def repository_revision() -> str:
         return f"tree-{value.hexdigest()}"
 
 
+def repository_tree_sha256() -> str:
+    """Hash runtime and compilation inputs, independent of rewritten Git history."""
+    digest = hashlib.sha256()
+    roots = [ROOT / name for name in ("skills", "policies", "contracts", "scripts", "platform-packages")]
+    paths = [
+        path for root in roots if root.exists()
+        for path in root.rglob("*")
+        if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc"
+    ]
+    paths.extend(
+        path for path in (
+            ROOT / "platforms.json",
+            ROOT / "learning_policy.json",
+            ROOT / "skill_contracts.json",
+            ROOT / "base-capabilities.json",
+            ROOT / "security_terms.json",
+        ) if path.is_file()
+    )
+    for path in sorted(set(paths)):
+        relative = path.relative_to(ROOT).as_posix()
+        if not path.is_file():
+            continue
+        digest.update(relative.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(hashlib.sha256(path.read_bytes()).digest())
+    return digest.hexdigest()
+
+
 def policy_version() -> int:
     value = load_json(ROOT / "learning_policy.json", {})
     return int(value.get("policy_version", 0))
@@ -124,7 +152,7 @@ def revision_for(manifest: dict[str, Any]) -> str:
     return learning_store.digest(
         {
             "schema_version": SCHEMA_VERSION,
-            "code_revision": repository_revision(),
+            "source_tree_sha256": repository_tree_sha256(),
             "knowledge_revision": manifest.get("revision"),
             "policy_version": policy_version(),
             "global_policy_sha256": global_policy_sha256(),
@@ -314,6 +342,7 @@ def compile_snapshot(
                 "schema_version": SCHEMA_VERSION,
                 "revision": revision,
                 "code_revision": repository_revision(),
+                "source_tree_sha256": repository_tree_sha256(),
                 "knowledge_revision": manifest.get("revision"),
                 "policy_version": policy_version(),
                 "global_policy_sha256": global_policy_sha256(),
@@ -517,6 +546,38 @@ def gc_task_pins(*, apply: bool = False) -> dict[str, Any]:
         reason = "legacy-unverifiable"
         record = registered.get(task_id, {}) if isinstance(registered, dict) else {}
         workspace_value = record.get("workspace") if isinstance(record, dict) else None
+        migrated_pin: dict[str, Any] | None = None
+        if int(pin.get("schema_version", 0)) < 2 and workspace_value:
+            workspace = Path(str(workspace_value))
+            if workspace.is_dir() and (workspace / "task-context.json").is_file():
+                status, checkpoint_revision, workspace_task_id = task_workspace_status(workspace)
+                if workspace_task_id == task_id:
+                    classification = (
+                        "active"
+                        if status not in {"complete", "completed", "resolved", "failed", "cancelled"}
+                        else "recoverable"
+                    )
+                    reason = "legacy-pin-migratable"
+                    migrated_pin = {
+                        **pin,
+                        "schema_version": 2,
+                        "workspace_hash": workspace_digest(workspace),
+                        "checkpoint_revision": checkpoint_revision,
+                        "task_revision": load_json(workspace / "task-context.json", {}).get("task_revision"),
+                        "task_status": status,
+                        "updated_at": now(),
+                    }
+        if int(pin.get("schema_version", 0)) < 2 and migrated_pin is None:
+            reason = "legacy-pin-quarantined"
+            migrated_pin = {
+                **pin,
+                "schema_version": 2,
+                "checkpoint_revision": None,
+                "task_revision": None,
+                "task_status": "unknown",
+                "migration_state": "quarantined-unverifiable",
+                "updated_at": now(),
+            }
         if int(pin.get("schema_version", 0)) >= 2 and workspace_value:
             workspace = Path(str(workspace_value))
             if not workspace.is_dir():
@@ -547,9 +608,15 @@ def gc_task_pins(*, apply: bool = False) -> dict[str, Any]:
                 "workspace_hash": pin.get("workspace_hash"),
                 "classification": classification,
                 "reason": reason,
+                "migratable": migrated_pin is not None,
+                "migrated_pin": migrated_pin,
             }
         )
     if apply:
+        for item in items:
+            migrated_pin = item.pop("migrated_pin", None)
+            if migrated_pin:
+                atomic_json(task_pins_root() / f"{item['task_id']}.json", migrated_pin)
         for task_id in orphaned:
             release_task(task_id)
         for item in items:
@@ -566,6 +633,8 @@ def gc_task_pins(*, apply: bool = False) -> dict[str, Any]:
             retained.add(str(active))
         retained.update(str(item) for item in state.get("history", [])[: KEEP_REVISIONS - 1])
         prune_revisions(retained)
+    for item in items:
+        item.pop("migrated_pin", None)
     counts = {
         state: sum(item["classification"] == state for item in items)
         for state in ("active", "recoverable", "orphaned", "released")
@@ -595,8 +664,9 @@ def status() -> dict[str, Any]:
     budgets = manifest.get("prompt_budgets", {})
     if active:
         failures.extend(snapshot_failures(str(active)))
-        if manifest.get("code_revision") != repository_revision():
-            failures.append("active snapshot was compiled from a different code revision")
+        current_tree = repository_tree_sha256()
+        if manifest.get("source_tree_sha256") != current_tree:
+            failures.append("active snapshot was compiled from a different source tree")
         current_knowledge = learning_store.load_manifest(rebuild=True).get("revision")
         if manifest.get("knowledge_revision") != current_knowledge:
             failures.append("active snapshot was compiled from a different knowledge revision")
@@ -624,6 +694,12 @@ def status() -> dict[str, Any]:
         "activation_mode": state.get("activation_mode"),
         "code_revision": manifest.get("code_revision"),
         "current_code_revision": repository_revision(),
+        "source_tree_sha256": manifest.get("source_tree_sha256"),
+        "current_source_tree_sha256": repository_tree_sha256(),
+        "effective_tree_match": bool(
+            manifest.get("source_tree_sha256")
+            and manifest.get("source_tree_sha256") == repository_tree_sha256()
+        ),
         "knowledge_revision": manifest.get("knowledge_revision"),
         "global_policy_sha256": manifest.get("global_policy_sha256"),
         "prompt_budgets": budgets,
@@ -659,6 +735,9 @@ def status() -> dict[str, Any]:
         "skills_root": str(current),
         "active_task_pins": task_pins(),
         "task_pin_health": gc_task_pins(),
+        "legacy_task_pins": sum(
+            int(item.get("schema_version", 0)) < 2 for item in task_pins()
+        ),
         "failures": failures,
     }
 
